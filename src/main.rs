@@ -5,7 +5,7 @@ fn index(info: web::Path<(String, u32)>) -> impl Responder {
 }
 
 fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().service(web::resource("/{name}/{id}/index.html").to(index)))
+    HttpServer::new(|| App::new().service(web::resource("/{name}/{id}/hello").to(index)))
         .bind("127.0.0.1:8080")?
         .run()
 }

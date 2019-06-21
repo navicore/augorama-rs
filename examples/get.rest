@@ -7,6 +7,6 @@ Content-Type: application/json; charset=utf-8
 --
 --
 
-GET /ed/1/index.html
+GET /mary/100/hello
 
 

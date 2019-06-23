@@ -5,4 +5,6 @@ authors = ["Ed Sweeney <ed@onextent.com>"]
 edition = "2018"
 
 [dependencies]
+log = "0.4"
 actix-web = "1.0"
+env_logger = "0.6"

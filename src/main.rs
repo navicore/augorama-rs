@@ -3,7 +3,6 @@ extern crate log;
 extern crate env_logger;
 
 use actix_web::{web, App, HttpServer, Responder};
-//use log::Level;
 
 fn index(info: web::Path<(String, u32)>) -> impl Responder {
     debug!("ejs this is a debug {}", "message");

@@ -2,13 +2,16 @@
 extern crate log;
 extern crate env_logger;
 
+mod demo;
+
 use warp::{self, path, Filter};
 
 fn main() {
     env_logger::init();
-    debug!("starting server");
+    info!("starting server");
     let hello = path!("hello" / String).map(|name| {
         debug!("handling {}", name);
+        demo::main();
         format!("Hello, {}!", name)
     });
 

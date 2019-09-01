@@ -9,6 +9,7 @@ impl Actor for MyActor {
 
     fn recv(&mut self, _ctx: &Context<String>, msg: String, _sender: Sender) {
         debug!("Received: {}", msg);
+        warn!("want to do something with: {}", msg);
         // todo: something
     }
 }

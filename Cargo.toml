@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 log = "0.4"
-env_logger = "0.6"
-warp = "0.1.19"
-riker = "0.3.1"
+env_logger = "0.7"
+warp = "0.1.20"
+riker = "0.3.2"
+either = "1.5"

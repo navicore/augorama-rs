@@ -3,8 +3,10 @@ extern crate log;
 extern crate env_logger;
 
 mod augieactor;
+mod augiemsg;
 
-use augieactor::{AugieMsg, AugieActor};
+use augiemsg::{AuMsg, AuCmd::*};
+use augieactor::{AugieActor};
 use std::collections::HashMap;
 use riker::actors::*;
 use warp::{self, path, Filter};
@@ -18,13 +20,13 @@ fn main() {
     let sys = Arc::new(Mutex::new(ActorSystem::new().unwrap()));
     let sys_shared = sys.clone();
 
-    let roots: Arc<Mutex<HashMap<String, ActorRef<AugieMsg<String>>>>> = Arc::new(Mutex::new(HashMap::new()));
-    let roots_shared: Arc<Mutex<HashMap<String, ActorRef<AugieMsg<String>>>>> = roots.clone();
+    let roots: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> = Arc::new(Mutex::new(HashMap::new()));
+    let roots_shared: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> = roots.clone();
 
     let actor1_level = path!("actor" / String / String).map(move |typ: String, id| -> String {
         let sys_shared = sys_shared.lock().unwrap();
 
-        let msg = AugieMsg {msg: "haha".to_string(), to: typ.clone(), forward: None};
+        let msg = AuMsg {msg: "haha".to_string(), cmd: Get, forward: None};
 
         // Check for a specific one.
         let mut roots_shared = roots_shared.lock().unwrap();

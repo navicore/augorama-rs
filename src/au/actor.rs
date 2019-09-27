@@ -6,7 +6,6 @@ use riker::actors::*;
 
 use crate::au::msg::AuMsg;
 
-
 pub struct AugieActor;
 
 impl Actor for AugieActor {

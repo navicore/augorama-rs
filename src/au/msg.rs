@@ -1,4 +1,5 @@
 use std::collections::LinkedList;
+
 use chrono::{DateTime, Utc};
 
 #[derive(Clone)]
@@ -82,9 +83,10 @@ mod tests {
         assert_eq!(t.name, "measurement".to_string());
         assert_eq!(t.value, 0.0);
     }
+
     #[test]
     fn default_override_works() {
-        let t = AuTelemetry {name: "charge_remaining".to_string(), value: 0.1,  ..Default::default()};
+        let t = AuTelemetry { name: "charge_remaining".to_string(), value: 0.1, ..Default::default() };
         assert_eq!(t.name, "charge_remaining".to_string());
         assert_eq!(t.value, 0.1);
     }

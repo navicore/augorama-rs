@@ -1,17 +1,18 @@
-#[macro_use]
-extern crate log;
+extern crate augorama;
 extern crate env_logger;
+extern crate log;
 
-mod augieactor;
-mod augiemsg;
-
-use augiemsg::{AuMsg, AuCmd::*};
-use augieactor::{AugieActor};
 use std::collections::HashMap;
-use riker::actors::*;
-use warp::{self, path, Filter};
 use std::sync::{Arc, Mutex};
+
+use log::{debug, info};
+use riker::actors::*;
 use riker::system::ActorSystem;
+use warp::{self, Filter, path};
+
+use augorama::au::actor::AugieActor;
+use augorama::au::msg::AuCmd::Get;
+use augorama::au::msg::AuMsg;
 
 fn main() {
     env_logger::init();
@@ -20,13 +21,18 @@ fn main() {
     let sys = Arc::new(Mutex::new(ActorSystem::new().unwrap()));
     let sys_shared = sys.clone();
 
-    let roots: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> = Arc::new(Mutex::new(HashMap::new()));
+    let roots: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> =
+        Arc::new(Mutex::new(HashMap::new()));
     let roots_shared: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> = roots.clone();
 
     let actor1_level = path!("actor" / String / String).map(move |typ: String, id| -> String {
         let sys_shared = sys_shared.lock().unwrap();
 
-        let msg = AuMsg {msg: "haha".to_string(), cmd: Get, forward: None};
+        let msg = AuMsg {
+            msg: "haha".to_string(),
+            cmd: Get,
+            forward: None,
+        };
 
         // Check for a specific one.
         let mut roots_shared = roots_shared.lock().unwrap();
@@ -47,15 +53,16 @@ fn main() {
         format!("Hello {} {}!", typ, id)
     });
 
-    let actor2_level =
-        path!("actor" / String / String / String / String).map(|parent, parent_id, typ, id| -> String {
+    let actor2_level = path!("actor" / String / String / String / String).map(
+        |parent, parent_id, typ, id| -> String {
             debug!(
                 "handling parent type {} id {} type {} id {} ",
                 parent, parent_id, typ, id
             );
             //augieactor::main();
             format!("Hello {}'s {} {}!", parent_id, typ, id)
-        });
+        },
+    );
 
     let routes = actor2_level.or(actor1_level);
     warp::serve(routes).run(([127, 0, 0, 1], 3030));

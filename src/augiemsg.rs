@@ -1,4 +1,5 @@
 use std::collections::LinkedList;
+use chrono::{DateTime, Utc};
 
 #[derive(Clone)]
 pub enum AuCmd {
@@ -9,9 +10,19 @@ pub enum AuCmd {
 
 #[derive(Clone)]
 pub struct AuTelemetry {
-    pub datetime: String,
+    pub datetime: DateTime<Utc>,
     pub name: String,
     pub value: f64,
+}
+
+impl Default for AuTelemetry {
+    fn default() -> Self {
+        AuTelemetry {
+            datetime: Utc::now(),
+            name: "measurement".to_string(),
+            value: 0.0,
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -60,3 +71,20 @@ impl std::fmt::Debug for AuCmd {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::augiemsg::*;
+
+    #[test]
+    fn autelemetry_default_works() {
+        let t = AuTelemetry::default();
+        assert_eq!(t.name, "measurement".to_string());
+    }
+    #[test]
+    fn autelemetry_default_override_works() {
+        let t = AuTelemetry {name: "hoho".to_string(), ..Default::default()};
+        assert_eq!(t.name, "hoho".to_string());
+    }
+}
+

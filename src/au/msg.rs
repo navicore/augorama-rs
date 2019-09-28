@@ -16,7 +16,6 @@ pub struct AuTelemetry {
     pub value: f64,
 }
 
-
 impl Default for AuTelemetry {
     fn default() -> Self {
         AuTelemetry {
@@ -38,7 +37,7 @@ impl AuForwards {
 
 impl Default for AuForwards {
     fn default() -> Self {
-        AuForwards (LinkedList::new())
+        AuForwards(LinkedList::new())
     }
 }
 
@@ -57,13 +56,21 @@ impl std::fmt::Display for AuForwards {
 
 impl std::fmt::Display for AuMsg<String> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "(msg: {} cmd: {} forward: {})", self.msg, self.cmd, self.forward)
+        write!(
+            f,
+            "(msg: {} cmd: {} forward: {})",
+            self.msg, self.cmd, self.forward
+        )
     }
 }
 
 impl std::fmt::Debug for AuMsg<String> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "(msg: {} cmd: {} forward: {})", self.msg, self.cmd, self.forward)
+        write!(
+            f,
+            "(msg: {} cmd: {} forward: {})",
+            self.msg, self.cmd, self.forward
+        )
     }
 }
 
@@ -100,9 +107,12 @@ mod tests {
 
     #[test]
     fn default_override_works() {
-        let t = AuTelemetry { name: "charge_remaining".to_string(), value: 0.1, ..Default::default() };
+        let t = AuTelemetry {
+            name: "charge_remaining".to_string(),
+            value: 0.1,
+            ..Default::default()
+        };
         assert_eq!(t.name, "charge_remaining".to_string());
         assert_eq!(t.value, 0.1);
     }
 }
-

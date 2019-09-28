@@ -7,11 +7,11 @@ use std::sync::{Arc, Mutex};
 use log::{debug, info};
 use riker::actors::*;
 use riker::system::ActorSystem;
-use warp::{self, Filter, path};
+use warp::{self, path, Filter};
 
 use crate::au::actor::AugieActor;
-use crate::au::msg::{AuForwards, AuMsg};
 use crate::au::msg::AuCmd::Get;
+use crate::au::msg::{AuForwards, AuMsg};
 
 pub mod au;
 

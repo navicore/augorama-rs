@@ -10,8 +10,8 @@ use riker::system::ActorSystem;
 use warp::{self, Filter, path};
 
 use crate::au::actor::AugieActor;
+use crate::au::msg::{AuForwards, AuMsg};
 use crate::au::msg::AuCmd::Get;
-use crate::au::msg::AuMsg;
 
 pub mod au;
 
@@ -32,7 +32,7 @@ pub fn serve() {
         let msg = AuMsg {
             msg: "haha".to_string(),
             cmd: Get,
-            forward: None,
+            forward: AuForwards::default(),
         };
 
         // Check for a specific one.

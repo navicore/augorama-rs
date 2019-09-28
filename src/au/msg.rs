@@ -16,6 +16,7 @@ pub struct AuTelemetry {
     pub value: f64,
 }
 
+
 impl Default for AuTelemetry {
     fn default() -> Self {
         AuTelemetry {
@@ -27,29 +28,42 @@ impl Default for AuTelemetry {
 }
 
 #[derive(Clone)]
+pub struct AuForwards(LinkedList<String>);
+
+impl AuForwards {
+    pub fn new() -> AuForwards {
+        AuForwards(LinkedList::new())
+    }
+}
+
+impl Default for AuForwards {
+    fn default() -> Self {
+        AuForwards (LinkedList::new())
+    }
+}
+
+#[derive(Clone)]
 pub struct AuMsg<T> {
     pub cmd: AuCmd,
     pub msg: T,
-    pub forward: Option<LinkedList<String>>,
+    pub forward: AuForwards,
+}
+
+impl std::fmt::Display for AuForwards {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "list of stuff")
+    }
 }
 
 impl std::fmt::Display for AuMsg<String> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        if self.forward.is_none() {
-            write!(f, "(msg: {} cmd: {})", self.msg, self.cmd)
-        } else {
-            write!(f, "(msg: {} cmd: {} forward: {})", self.msg, self.cmd, "self.forward")
-        }
+        write!(f, "(msg: {} cmd: {} forward: {})", self.msg, self.cmd, self.forward)
     }
 }
 
 impl std::fmt::Debug for AuMsg<String> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        if self.forward.is_none() {
-            write!(f, "(msg: {} cmd: {})", self.msg, self.cmd)
-        } else {
-            write!(f, "(msg: {} cmd: {} forward: {})", self.msg, self.cmd, "self.forward")
-        }
+        write!(f, "(msg: {} cmd: {} forward: {})", self.msg, self.cmd, self.forward)
     }
 }
 

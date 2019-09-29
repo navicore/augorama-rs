@@ -1,3 +1,10 @@
+//! Implements all internal data structures used in Augorama.
+//!
+//! The main data structure is the AuMsg, an envelope for commands and queries.  A command may
+//! be a query to get state, a query to get journal records, or a command to update state with
+//! the attached telemetry.  Telemetry is always a record with a name, datetime, and a numerical
+//! value.
+
 use std::collections::LinkedList;
 
 use chrono::{DateTime, Utc};
@@ -9,10 +16,14 @@ pub enum AuCmd {
     //Ls,
 }
 
+/// The single data structure representing the source of all actor state.
 #[derive(Clone)]
 pub struct AuTelemetry {
+    /// UTC TZ 8601 format that is ideally a representation of when the observation was made in the real world
     pub datetime: DateTime<Utc>,
+    /// space (deployment) scoped name to type (not instance), ie: `refrigerator.temp.celsius`
     pub name: String,
+    /// a double, ie: `22.9`
     pub value: f64,
 }
 

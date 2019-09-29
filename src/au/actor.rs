@@ -1,6 +1,10 @@
-//! The Actor module implements the main building block of the Augorama system.  The actor ingests
-//! `AuMsg` messages.  Some of these messages are queries for state information.  Some are updates
-//! containing new telemetry to advance state.
+//! The main building block of the Augorama system.  The actor ingests
+//! `AuMsg` messages.
+//!
+//! These messages may be:
+//!   * updates containing new telemetry to advance state.
+//!   * queries for state information.
+//!   * queries for journal records.
 
 extern crate env_logger;
 extern crate log;

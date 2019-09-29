@@ -1,3 +1,7 @@
+//! # Integration Tests
+//!
+//! Starts up an Augorama space in a thread and accesses the actors via http client.
+//!
 extern crate augorama;
 
 use std::{thread, time};

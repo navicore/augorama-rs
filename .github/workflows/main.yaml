@@ -43,16 +43,20 @@ jobs:
         with:
           command: fmt
           args: --all -- --check
-
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - id: component
+        uses: actions-rs/components-nightly@v1
+        with:
+          target: x86_64-unknown-linux-gnu
+          component: clippy
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly
-          override: true
+            toolchain: ${{ steps.component.outputs.toolchain }}
+            override: true
       - run: rustup component add clippy
       - uses: actions-rs/cargo@v1
         with:

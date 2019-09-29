@@ -33,6 +33,7 @@ use crate::au::msg::{AuForwards, AuMsg};
 
 pub mod au;
 
+/// blocking call to run server.  server will open a port and expect http requests.
 pub fn serve() {
     env_logger::init();
     info!("starting actor space");
@@ -44,6 +45,7 @@ pub fn serve() {
         Arc::new(Mutex::new(HashMap::new()));
     let roots_shared: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> = roots.clone();
 
+    // route for root level actors, ie: an actor type and an instance id
     let actor1_level = path!("actor" / String / String).map(move |typ: String, id| -> String {
         let sys_shared = sys_shared.lock().unwrap();
 
@@ -66,19 +68,22 @@ pub fn serve() {
             }
         };
 
+        //ejs todo ask:
         actor.tell(msg, None);
 
-        //demo::main();
+        //ejs todo result:
         format!("Hello {} {}!", typ, id)
     });
 
+    // 2nd level actors, ie: an actor type and an instance id that is the child of a root actor.
     let actor2_level = path!("actor" / String / String / String / String).map(
         |parent, parent_id, typ, id| -> String {
             debug!(
                 "handling parent type {} id {} type {} id {} ",
                 parent, parent_id, typ, id
             );
-            //augieactor::main();
+            //ejs todo ask:
+            //ejs todo result:
             format!("Hello {}'s {} {}!", parent_id, typ, id)
         },
     );

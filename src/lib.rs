@@ -1,3 +1,7 @@
+#![doc(html_root_url = "https://github.com/navicore/augorama-rs")]
+#![doc(html_favicon_url = "https://onextent.com/favicon.ico")]
+#![doc(html_logo_url = "https://onextent.com/OnExtentLogo_RGB.png")]
+
 //! The Augorama module implements the entry point to the Augorama actor system.
 //!
 //! Augorama is a server hosting a graph of digital twins (Augorama actors) of real and virtual

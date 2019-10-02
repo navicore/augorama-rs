@@ -24,16 +24,22 @@ extern crate env_logger;
 extern crate log;
 
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, MutexGuard};
 
 use log::{debug, info};
 use riker::actors::*;
 use riker::system::ActorSystem;
+use riker_patterns::ask::*;
 use warp::{self, path, Filter};
+
+use futures::future::RemoteHandle;
 
 use crate::au::actor::AugieActor;
 use crate::au::msg::AuCmd::Get;
 use crate::au::msg::{AuForwards, AuMsg};
+use futures::executor::block_on;
+use std::borrow::Borrow;
+use std::ops::Deref;
 
 pub mod au;
 
@@ -43,24 +49,27 @@ pub fn serve() {
     info!("starting actor space");
 
     let sys = Arc::new(Mutex::new(ActorSystem::new().unwrap()));
-    let sys_shared = sys.clone();
+    let sys_shared1 = sys.clone();
+    let sys_shared2 = sys.clone();
+    //let sys_shared2 = sys.clone();
 
     let roots: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> =
         Arc::new(Mutex::new(HashMap::new()));
-    let roots_shared: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> = roots.clone();
+    let roots_shared1: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> = roots.clone();
+    let roots_shared2: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> = roots.clone();
 
     // route for root level actors, ie: an actor type and an instance id
     let actor1_level = path!("actor" / String / String).map(move |typ: String, id| -> String {
-        let sys_shared = sys_shared.lock().unwrap();
+        let sys_shared: MutexGuard<ActorSystem> = sys_shared1.lock().unwrap();
 
-        let msg = AuMsg {
-            msg: "haha".to_string(),
+        let msg: AuMsg<String> = AuMsg {
+            msg: id,
             cmd: Get,
             forward: AuForwards::default(),
         };
 
         // Check for a specific one.
-        let mut roots_shared = roots_shared.lock().unwrap();
+        let mut roots_shared = roots_shared1.lock().unwrap();
         let actor = match roots_shared.get(&typ) {
             Some(actor) => actor.clone(),
             None => {
@@ -72,23 +81,47 @@ pub fn serve() {
             }
         };
 
-        //ejs todo ask:
-        actor.tell(msg, None);
+        let sys = sys_shared.borrow().deref();
+        let res: RemoteHandle<AuMsg<String>> = ask(sys, &actor, msg);
+        let response = block_on(res);
 
-        //ejs todo result:
-        format!("Hello {} {}!", typ, id)
+        //ejs todo result in json:
+        format!("Hi {} {}!", typ, response.msg)
     });
 
     // 2nd level actors, ie: an actor type and an instance id that is the child of a root actor.
     let actor2_level = path!("actor" / String / String / String / String).map(
-        |parent, parent_id, typ, id| -> String {
-            debug!(
-                "handling parent type {} id {} type {} id {} ",
-                parent, parent_id, typ, id
-            );
-            //ejs todo ask:
-            //ejs todo result:
-            format!("Hello {}'s {} {}!", parent_id, typ, id)
+        move |parent: String, parent_id, typ: String, id| -> String {
+            let sys_shared: MutexGuard<ActorSystem> = sys_shared2.lock().unwrap();
+
+            let msg: AuMsg<String> = AuMsg {
+                msg: id,
+                cmd: Get,
+                forward: AuForwards::new_one(typ.clone()),
+            };
+
+            // Check for a specific one.
+            let mut roots_shared = roots_shared2.lock().unwrap();
+            let actor = match roots_shared.get(&parent) {
+                Some(actor) => {
+                    debug!("found existing parent actor of type {}", parent);
+                    actor.clone()
+                }
+                None => {
+                    debug!("creating parent actor of type {}", parent);
+                    let props = AugieActor::props();
+                    let new_actor = sys_shared.actor_of(props, &parent).unwrap();
+                    roots_shared.insert(parent.to_string(), new_actor.clone());
+                    new_actor
+                }
+            };
+
+            let sys = sys_shared.borrow().deref();
+            let res: RemoteHandle<AuMsg<String>> = ask(sys, &actor, msg);
+            let response = block_on(res);
+
+            //ejs todo result in json:
+            format!("Hello {}'s {} {}!", parent_id, typ, response.msg)
         },
     );
 

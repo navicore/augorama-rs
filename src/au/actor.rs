@@ -9,27 +9,34 @@
 extern crate env_logger;
 extern crate log;
 
-use log::{debug, warn};
-use riker::actors::*;
+use log::{debug, error};
 
 use crate::au::msg::AuMsg;
+use riker::actors::{Actor, ActorReference, BoxActorProd, Context, Props, Sender};
 
 pub struct AugieActor;
 
 impl Actor for AugieActor {
     type Msg = AuMsg<String>;
 
-    fn recv(&mut self, _ctx: &Context<AuMsg<String>>, msg: AuMsg<String>, _sender: Sender) {
-        debug!("Received: {}", msg);
+    fn recv(&mut self, ctx: &Context<AuMsg<String>>, msg: AuMsg<String>, sender: Sender) {
         // todo: 0 ejs make forwards vector? for slicing.
         // todo: 1 ejs check to see if this is a fwd msg
         // todo: 2 if no, echo it with world
         // todo: 3 if yes, pop top off of forward, make new msg, lookup or create child, send...
-        for _x in _ctx.myself.children() {
-            //x.
+
+        // ejs todo: if (msg.forward.)
+        // if forwards len > 0
+        for x in ctx.myself.children() {
+            debug!("child found named {}", x.name())
         }
-        warn!("want to do something with: {}", msg);
-        // todo: something
+
+        // else it is mine
+        let result = sender.unwrap().try_tell(msg, Some(ctx.myself().into()));
+        match result {
+            Ok(_) => debug!("sent"),
+            Err(_) => error!("NOT sent"),
+        }
     }
 }
 

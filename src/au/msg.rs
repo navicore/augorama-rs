@@ -41,6 +41,11 @@ impl Default for AuTelemetry {
 pub struct AuForwards(LinkedList<String>);
 
 impl AuForwards {
+    pub fn new_one(name: String) -> AuForwards {
+        let mut ll = LinkedList::new();
+        ll.push_back(name);
+        AuForwards(ll)
+    }
     pub fn new() -> AuForwards {
         AuForwards(LinkedList::new())
     }

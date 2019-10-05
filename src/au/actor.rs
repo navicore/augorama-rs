@@ -34,14 +34,22 @@ fn fwd(ctx: &Context<AuMsg<String>>, msg: AuMsg<String>, sender: Sender) {
             let child = ctx.myself.children().find(|x| x.name() == next_id);
             match child {
                 Some(sel) => {
-                    debug!("{} forwarding to existing child {}", ctx.myself.name(), next_id);
+                    debug!(
+                        "{} forwarding to existing child {}",
+                        ctx.myself.name(),
+                        next_id
+                    );
                     match sel.try_tell(fmsg, sender) {
-                        Ok(_) => debug!("sent"),
-                        _ => debug!("not sent"),
+                        Ok(_) => {}
+                        _ => error!("not sent"),
                     }
                 }
                 _ => {
-                    debug!("{} forwarding to newly created child {}", ctx.myself.name(), next_id);
+                    debug!(
+                        "{} forwarding to newly created child {}",
+                        ctx.myself.name(),
+                        next_id
+                    );
                     let props = AugieActor::props();
                     let new_actor = ctx.actor_of(props, &next_id.to_string()).unwrap();
                     new_actor.tell(fmsg, sender);

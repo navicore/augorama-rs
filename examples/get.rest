@@ -13,5 +13,8 @@ GET /actor/person/Erdal
 GET /actor/person/Erdal/pet/Sammy
 
 --
+GET /actor/person/Erdal/pet/Sammy/flee/Mikey
+
+--
 -v
 GET /hiya/ahmed

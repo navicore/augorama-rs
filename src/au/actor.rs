@@ -30,21 +30,21 @@ impl Actor for AugieActor {
             match msg.path.get(0) {
                 Some(typ) => {
                     debug!(
-                        "{} received msg addressed to child named {}",
+                        "{} received msg addressed to child {}",
                         ctx.myself.name(),
                         typ
                     );
                     let child = ctx.myself.children().find(|x| x.name() == typ);
                     match child {
                         Some(sel) => {
-                            debug!("forwarding to existing child of type {}", typ);
+                            debug!("forwarding to existing child {}", typ);
                             match sel.try_tell(fmsg, sender) {
                                 Ok(_) => debug!("sent"),
                                 _ => debug!("not sent"),
                             }
                         }
                         _ => {
-                            debug!("creating child actor of type {}", typ);
+                            debug!("creating child {}", typ);
                             let props = AugieActor::props();
                             let new_actor = ctx.actor_of(props, &typ.to_string()).unwrap();
                             new_actor.tell(fmsg, sender);
@@ -54,7 +54,7 @@ impl Actor for AugieActor {
                 None => error!("path error: {}", ctx.myself.name()),
             }
         } else {
-            debug!("{} received msg addressed to itself", ctx.myself.name());
+            debug!("{} received msg", ctx.myself.name());
             // else it is mine
             let result = sender.unwrap().try_tell(msg, Some(ctx.myself().into()));
             match result {

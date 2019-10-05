@@ -54,11 +54,11 @@ fn create_actor_and_wait(typ: String, id: String, path: Vec<String>,
 
     let actor = match roots_shared.get(&typ) {
         Some(actor) => {
-            debug!("found existing root actor of type {}", typ);
+            debug!("found existing root {}", typ);
             actor.clone()
         }
         None => {
-            debug!("creating root actor of type {}", typ);
+            debug!("creating root {}", typ);
             let props = AugieActor::props();
             let new_actor = sys_shared.actor_of(props, &typ).unwrap();
             roots_shared.insert(typ.to_string(), new_actor.clone());

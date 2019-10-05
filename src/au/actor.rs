@@ -9,10 +9,10 @@
 extern crate env_logger;
 extern crate log;
 
+use riker::actors::*;
 use log::{debug, error};
 
 use crate::au::msg::AuMsg;
-use riker::actors::{Actor, ActorReference, BoxActorProd, Context, Props, Sender};
 
 pub struct AugieActor;
 
@@ -20,23 +20,47 @@ impl Actor for AugieActor {
     type Msg = AuMsg<String>;
 
     fn recv(&mut self, ctx: &Context<AuMsg<String>>, msg: AuMsg<String>, sender: Sender) {
-        // todo: 0 ejs make forwards vector? for slicing.
-        // todo: 1 ejs check to see if this is a fwd msg
-        // todo: 2 if no, echo it with world
-        // todo: 3 if yes, pop top off of forward, make new msg, lookup or create child, send...
 
-        // ejs todo: if (msg.forward.)
-        //if (msg.forward.) {} else {}
-        // if forwards len > 0
-        for x in ctx.myself.children() {
-            debug!("child found named {}", x.name())
-        }
+        debug!("{} received msg", ctx.myself.name());
+        if !msg.path.is_empty() {
+            debug!("{} received msg addressed to child", ctx.myself.name());
+            let fmsg = AuMsg {
+                msg: msg.msg,
+                cmd: msg.cmd,
+                path: msg.path.clone().split_off(1),
+            };
 
-        // else it is mine
-        let result = sender.unwrap().try_tell(msg, Some(ctx.myself().into()));
-        match result {
-            Ok(_) => debug!("sent"),
-            Err(_) => error!("NOT sent"),
+            match msg.path.get(0) {
+                Some(typ) => {
+                    debug!("{} received msg addressed to child named {}", ctx.myself.name(), typ);
+                    let child = ctx.myself.children().find(|x| {
+                        x.name() == typ
+                    });
+                    match child {
+                        Some(sel) => {
+                            debug!("forwarding to existing child of type {}", typ);
+                            match sel.try_tell(fmsg, sender) {
+                                Ok(_) => debug!("sent"),
+                                _ => debug!("not sent")
+                            }
+                        }
+                        _ => {
+                            debug!("creating child actor of type {}", typ);
+                            let props = AugieActor::props();
+                            let new_actor = ctx.actor_of(props, &typ.to_string()).unwrap();
+                            new_actor.tell(fmsg, sender);
+                        }
+                    };
+                }
+                None => error!("haha")
+            }
+        } else {
+            // else it is mine
+            let result = sender.unwrap().try_tell(msg, Some(ctx.myself().into()));
+            match result {
+                Ok(_) => debug!("{} sent reply", ctx.myself.name()),
+                Err(_) => error!("NOT sent"),
+            }
         }
     }
 }

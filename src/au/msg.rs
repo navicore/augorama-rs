@@ -5,8 +5,6 @@
 //! the attached telemetry.  Telemetry is always a record with a name, datetime, and a numerical
 //! value.
 
-use std::collections::LinkedList;
-
 use chrono::{DateTime, Utc};
 
 #[derive(Clone)]
@@ -38,44 +36,18 @@ impl Default for AuTelemetry {
 }
 
 #[derive(Clone)]
-pub struct AuForwards(LinkedList<String>);
-
-impl AuForwards {
-    pub fn new_one(name: String) -> AuForwards {
-        let mut ll = LinkedList::new();
-        ll.push_back(name);
-        AuForwards(ll)
-    }
-    pub fn new() -> AuForwards {
-        AuForwards(LinkedList::new())
-    }
-}
-
-impl Default for AuForwards {
-    fn default() -> Self {
-        AuForwards(LinkedList::new())
-    }
-}
-
-#[derive(Clone)]
 pub struct AuMsg<T> {
     pub cmd: AuCmd,
     pub msg: T,
-    pub forward: AuForwards,
-}
-
-impl std::fmt::Display for AuForwards {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "list of stuff")
-    }
+    pub path: Vec<String>,
 }
 
 impl std::fmt::Display for AuMsg<String> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
-            "(msg: {} cmd: {} forward: {})",
-            self.msg, self.cmd, self.forward
+            "(msg: {} cmd: {} path: ?)",
+            self.msg, self.cmd
         )
     }
 }
@@ -84,8 +56,8 @@ impl std::fmt::Debug for AuMsg<String> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
-            "(msg: {} cmd: {} forward: {})",
-            self.msg, self.cmd, self.forward
+            "(msg: {} cmd: {} path: ?)",
+            self.msg, self.cmd
         )
     }
 }
@@ -112,7 +84,7 @@ impl std::fmt::Debug for AuCmd {
 
 #[cfg(test)]
 mod tests {
-    use crate::au::msg::AuTelemetry;
+    use crate::au::msg::*;
 
     #[test]
     fn default_works() {
@@ -120,12 +92,22 @@ mod tests {
         assert_eq!(t.name, "measurement".to_string());
         assert_eq!(t.value, 0.0);
     }
-    //
-    //    #[test]
-    //    fn forward_inspect_works() {
-    //        let f = AuFoward("toMe");
-    //        f.
-    //    }
+
+    #[test]
+    fn path_inspect_works() {
+        let m = AuMsg {
+                msg: "myid",
+                cmd: AuCmd::Get,
+                path: vec!("root".to_string(), "actors".to_string(), "actor1".to_string(), "child1".to_string())
+            };
+
+        let r = m.path.get(0);
+        assert!(r.is_some());
+        match r {
+            Some(root) => assert_eq!(root, "root"),
+            None => assert!(false)
+        }
+    }
 
     #[test]
     fn default_override_works() {
@@ -137,4 +119,5 @@ mod tests {
         assert_eq!(t.name, "charge_remaining".to_string());
         assert_eq!(t.value, 0.1);
     }
+
 }

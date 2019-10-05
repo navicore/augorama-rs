@@ -36,7 +36,7 @@ use futures::future::RemoteHandle;
 
 use crate::au::actor::AugieActor;
 use crate::au::msg::AuCmd::Get;
-use crate::au::msg::{AuForwards, AuMsg};
+use crate::au::msg::AuMsg;
 use futures::executor::block_on;
 use std::borrow::Borrow;
 use std::ops::Deref;
@@ -65,7 +65,7 @@ pub fn serve() {
         let msg: AuMsg<String> = AuMsg {
             msg: id,
             cmd: Get,
-            forward: AuForwards::default(),
+            path: Vec::new()
         };
 
         // Check for a specific one.
@@ -97,7 +97,7 @@ pub fn serve() {
             let msg: AuMsg<String> = AuMsg {
                 msg: id,
                 cmd: Get,
-                forward: AuForwards::new_one(typ.clone()),
+                path: vec!(typ.clone()),
             };
 
             // Check for a specific one.

@@ -13,7 +13,6 @@ use log::{debug, error};
 
 use crate::au::msg::AuMsg;
 use riker::actors::{Actor, ActorReference, BoxActorProd, Context, Props, Sender};
-use std::borrow::Borrow;
 
 pub struct AugieActor;
 

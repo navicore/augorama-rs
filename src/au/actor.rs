@@ -21,9 +21,7 @@ impl Actor for AugieActor {
 
     fn recv(&mut self, ctx: &Context<AuMsg<String>>, msg: AuMsg<String>, sender: Sender) {
 
-        debug!("{} received msg", ctx.myself.name());
         if !msg.path.is_empty() {
-            debug!("{} received msg addressed to child", ctx.myself.name());
             let fmsg = AuMsg {
                 msg: msg.msg,
                 cmd: msg.cmd,
@@ -43,7 +41,7 @@ impl Actor for AugieActor {
                                 Ok(_) => debug!("sent"),
                                 _ => debug!("not sent")
                             }
-                        }
+                        },
                         _ => {
                             debug!("creating child actor of type {}", typ);
                             let props = AugieActor::props();
@@ -51,10 +49,11 @@ impl Actor for AugieActor {
                             new_actor.tell(fmsg, sender);
                         }
                     };
-                }
-                None => error!("haha")
+                },
+                None => error!("path error: {}", ctx.myself.name())
             }
         } else {
+            debug!("{} received msg addressed to itself", ctx.myself.name());
             // else it is mine
             let result = sender.unwrap().try_tell(msg, Some(ctx.myself().into()));
             match result {

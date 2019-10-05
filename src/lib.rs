@@ -59,13 +59,12 @@ pub fn serve() {
     let roots_shared2: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> = roots.clone();
 
     // route for root level actors, ie: an actor type and an instance id
-    let actor1_level = path!("actor" / String / String).map(move |typ: String, id| -> String {
+    let actor1_level = path!("actor" / String / String).map(move |typ: String, id: String| -> String {
         let sys_shared: MutexGuard<ActorSystem> = sys_shared1.lock().unwrap();
-
         let msg: AuMsg<String> = AuMsg {
-            msg: id,
+            msg: id.clone(),
             cmd: Get,
-            path: Vec::new(),
+            path: vec![id.clone()],
         };
 
         // Check for a specific one.
@@ -91,13 +90,13 @@ pub fn serve() {
 
     // 2nd level actors, ie: an actor type and an instance id that is the child of a root actor.
     let actor2_level = path!("actor" / String / String / String / String).map(
-        move |parent: String, parent_id, typ: String, id| -> String {
+        move |parent: String, parent_id: String, typ: String, id: String| -> String {
             let sys_shared: MutexGuard<ActorSystem> = sys_shared2.lock().unwrap();
 
             let msg: AuMsg<String> = AuMsg {
-                msg: id,
+                msg: id.clone(),
                 cmd: Get,
-                path: vec![typ.clone()],
+                path: vec![parent_id.clone(), typ.clone(), id.clone()],
             };
 
             // Check for a specific one.

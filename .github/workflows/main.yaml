@@ -43,7 +43,7 @@ jobs:
         with:
             toolchain: ${{ steps.component.outputs.toolchain }}
             override: true
-      - run: rustup component add fmt
+      - run: rustup component add rustfmt
       - uses: actions-rs/cargo@v1
         with:
           command: fmt

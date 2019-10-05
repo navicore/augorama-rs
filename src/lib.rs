@@ -35,7 +35,7 @@ use log::{debug, info};
 use riker::actors::*;
 use riker::system::ActorSystem;
 use riker_patterns::ask::*;
-use warp::{self, Filter, path};
+use warp::{self, path, Filter};
 
 use crate::au::actor::AugieActor;
 use crate::au::msg::AuCmd::Get;
@@ -43,9 +43,13 @@ use crate::au::msg::AuMsg;
 
 pub mod au;
 
-fn create_actor_and_wait(typ: String, id: String, path: Vec<String>,
-                         sys_shared: MutexGuard<ActorSystem>,
-                         mut roots_shared: MutexGuard<HashMap<String, ActorRef<AuMsg<String>>, RandomState>>) -> String {
+fn create_actor_and_wait(
+    typ: String,
+    id: String,
+    path: Vec<String>,
+    sys_shared: MutexGuard<ActorSystem>,
+    mut roots_shared: MutexGuard<HashMap<String, ActorRef<AuMsg<String>>, RandomState>>,
+) -> String {
     let msg: AuMsg<String> = AuMsg {
         msg: id.clone(),
         cmd: Get,
@@ -101,31 +105,123 @@ pub fn serve() {
     // route for root level actors, ie: an actor type and an instance id
     let route2 =
         path!("actor" / String / String).map(move |root_typ: String, id: String| -> String {
-            create_actor_and_wait(root_typ, id.clone(), vec!(id), sys_shared1.lock().unwrap(), roots_shared1.lock().unwrap())
+            create_actor_and_wait(
+                root_typ,
+                id.clone(),
+                vec![id],
+                sys_shared1.lock().unwrap(),
+                roots_shared1.lock().unwrap(),
+            )
         });
 
     // 2nd level actors, ie: an actor type and an instance id that is the child of a root actor.
     let route4 = path!("actor" / String / String / String / String).map(
         move |root_typ: String, root_id: String, child_typ: String, id: String| -> String {
-            create_actor_and_wait(root_typ, id.clone(), vec!(root_id.clone(), child_typ.clone(), id.clone()), sys_shared2.lock().unwrap(), roots_shared2.lock().unwrap())
+            create_actor_and_wait(
+                root_typ,
+                id.clone(),
+                vec![root_id.clone(), child_typ.clone(), id.clone()],
+                sys_shared2.lock().unwrap(),
+                roots_shared2.lock().unwrap(),
+            )
         },
     );
 
     let route6 = path!("actor" / String / String / String / String / String / String).map(
-        move |root_typ: String, root_id: String, child1_typ: String, child1_id: String, child_typ: String, id: String| -> String {
-            create_actor_and_wait(root_typ, id.clone(), vec!(root_id.clone(), child1_typ.clone(), child1_id.clone(), child_typ.clone(), id.clone()), sys_shared3.lock().unwrap(), roots_shared3.lock().unwrap())
+        move |root_typ: String,
+              root_id: String,
+              child1_typ: String,
+              child1_id: String,
+              child_typ: String,
+              id: String|
+              -> String {
+            create_actor_and_wait(
+                root_typ,
+                id.clone(),
+                vec![
+                    root_id.clone(),
+                    child1_typ.clone(),
+                    child1_id.clone(),
+                    child_typ.clone(),
+                    id.clone(),
+                ],
+                sys_shared3.lock().unwrap(),
+                roots_shared3.lock().unwrap(),
+            )
         },
     );
 
-    let route8 = path!("actor" / String / String / String / String / String / String / String / String).map(
-        move |root_typ: String, root_id: String, child1_typ: String, child1_id: String, child2_typ: String, child2_id: String, child_typ: String, id: String| -> String {
-            create_actor_and_wait(root_typ, id.clone(), vec!(root_id.clone(), child1_typ.clone(), child1_id.clone(), child2_typ.clone(), child2_id.clone(), child_typ.clone(), id.clone()), sys_shared4.lock().unwrap(), roots_shared4.lock().unwrap())
-        },
-    );
+    let route8 =
+        path!("actor" / String / String / String / String / String / String / String / String).map(
+            move |root_typ: String,
+                  root_id: String,
+                  child1_typ: String,
+                  child1_id: String,
+                  child2_typ: String,
+                  child2_id: String,
+                  child_typ: String,
+                  id: String|
+                  -> String {
+                create_actor_and_wait(
+                    root_typ,
+                    id.clone(),
+                    vec![
+                        root_id.clone(),
+                        child1_typ.clone(),
+                        child1_id.clone(),
+                        child2_typ.clone(),
+                        child2_id.clone(),
+                        child_typ.clone(),
+                        id.clone(),
+                    ],
+                    sys_shared4.lock().unwrap(),
+                    roots_shared4.lock().unwrap(),
+                )
+            },
+        );
 
-    let route10 = path!("actor" / String / String / String / String / String / String / String / String / String / String).map(
-        move |root_typ: String, root_id: String, child1_typ: String, child1_id: String, child2_typ: String, child2_id: String, child3_typ: String, child3_id: String, child_typ: String, id: String| -> String {
-            create_actor_and_wait(root_typ, id.clone(), vec!(root_id.clone(), child1_typ.clone(), child1_id.clone(), child2_typ.clone(), child2_id.clone(), child3_typ.clone(), child3_id.clone(), child_typ.clone(), id.clone()), sys_shared5.lock().unwrap(), roots_shared5.lock().unwrap())
+    let route10 = path!(
+        "actor"
+            / String
+            / String
+            / String
+            / String
+            / String
+            / String
+            / String
+            / String
+            / String
+            / String
+    )
+    .map(
+        move |root_typ: String,
+              root_id: String,
+              child1_typ: String,
+              child1_id: String,
+              child2_typ: String,
+              child2_id: String,
+              child3_typ: String,
+              child3_id: String,
+              child_typ: String,
+              id: String|
+              -> String {
+            create_actor_and_wait(
+                root_typ,
+                id.clone(),
+                vec![
+                    root_id.clone(),
+                    child1_typ.clone(),
+                    child1_id.clone(),
+                    child2_typ.clone(),
+                    child2_id.clone(),
+                    child3_typ.clone(),
+                    child3_id.clone(),
+                    child_typ.clone(),
+                    id.clone(),
+                ],
+                sys_shared5.lock().unwrap(),
+                roots_shared5.lock().unwrap(),
+            )
         },
     );
 

@@ -18,9 +18,8 @@ pub struct AugieActor;
 
 fn fwd(ctx: &Context<AuMsg<String>>, msg: AuMsg<String>, sender: Sender) {
     let fmsg = AuMsg {
-        msg: msg.msg,
-        cmd: msg.cmd,
         path: msg.path.clone().split_off(1),
+        ..msg
     };
 
     match msg.path.get(0) {

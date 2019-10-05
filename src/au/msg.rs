@@ -120,6 +120,12 @@ mod tests {
         assert_eq!(t.name, "measurement".to_string());
         assert_eq!(t.value, 0.0);
     }
+    //
+    //    #[test]
+    //    fn forward_inspect_works() {
+    //        let f = AuFoward("toMe");
+    //        f.
+    //    }
 
     #[test]
     fn default_override_works() {

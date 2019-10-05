@@ -13,6 +13,7 @@ use log::{debug, error};
 
 use crate::au::msg::AuMsg;
 use riker::actors::{Actor, ActorReference, BoxActorProd, Context, Props, Sender};
+use std::borrow::Borrow;
 
 pub struct AugieActor;
 
@@ -26,6 +27,7 @@ impl Actor for AugieActor {
         // todo: 3 if yes, pop top off of forward, make new msg, lookup or create child, send...
 
         // ejs todo: if (msg.forward.)
+        //if (msg.forward.) {} else {}
         // if forwards len > 0
         for x in ctx.myself.children() {
             debug!("child found named {}", x.name())

@@ -44,21 +44,13 @@ pub struct AuMsg<T> {
 
 impl std::fmt::Display for AuMsg<String> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(
-            f,
-            "(msg: {} cmd: {} path: ?)",
-            self.msg, self.cmd
-        )
+        write!(f, "(msg: {} cmd: {} path: ?)", self.msg, self.cmd)
     }
 }
 
 impl std::fmt::Debug for AuMsg<String> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(
-            f,
-            "(msg: {} cmd: {} path: ?)",
-            self.msg, self.cmd
-        )
+        write!(f, "(msg: {} cmd: {} path: ?)", self.msg, self.cmd)
     }
 }
 
@@ -96,16 +88,21 @@ mod tests {
     #[test]
     fn path_inspect_works() {
         let m = AuMsg {
-                msg: "myid",
-                cmd: AuCmd::Get,
-                path: vec!("root".to_string(), "actors".to_string(), "actor1".to_string(), "child1".to_string())
-            };
+            msg: "myid",
+            cmd: AuCmd::Get,
+            path: vec![
+                "root".to_string(),
+                "actors".to_string(),
+                "actor1".to_string(),
+                "child1".to_string(),
+            ],
+        };
 
         let r = m.path.get(0);
         assert!(r.is_some());
         match r {
             Some(root) => assert_eq!(root, "root"),
-            None => assert!(false)
+            None => assert!(false),
         }
     }
 
@@ -119,5 +116,4 @@ mod tests {
         assert_eq!(t.name, "charge_remaining".to_string());
         assert_eq!(t.value, 0.1);
     }
-
 }

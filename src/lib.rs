@@ -65,7 +65,7 @@ pub fn serve() {
         let msg: AuMsg<String> = AuMsg {
             msg: id,
             cmd: Get,
-            path: Vec::new()
+            path: Vec::new(),
         };
 
         // Check for a specific one.
@@ -97,7 +97,7 @@ pub fn serve() {
             let msg: AuMsg<String> = AuMsg {
                 msg: id,
                 cmd: Get,
-                path: vec!(typ.clone()),
+                path: vec![typ.clone()],
             };
 
             // Check for a specific one.

@@ -59,34 +59,35 @@ pub fn serve() {
     let roots_shared2: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> = roots.clone();
 
     // route for root level actors, ie: an actor type and an instance id
-    let actor1_level = path!("actor" / String / String).map(move |typ: String, id: String| -> String {
-        let sys_shared: MutexGuard<ActorSystem> = sys_shared1.lock().unwrap();
-        let msg: AuMsg<String> = AuMsg {
-            msg: id.clone(),
-            cmd: Get,
-            path: vec![id.clone()],
-        };
+    let actor1_level =
+        path!("actor" / String / String).map(move |typ: String, id: String| -> String {
+            let sys_shared: MutexGuard<ActorSystem> = sys_shared1.lock().unwrap();
+            let msg: AuMsg<String> = AuMsg {
+                msg: id.clone(),
+                cmd: Get,
+                path: vec![id.clone()],
+            };
 
-        // Check for a specific one.
-        let mut roots_shared = roots_shared1.lock().unwrap();
-        let actor = match roots_shared.get(&typ) {
-            Some(actor) => actor.clone(),
-            None => {
-                debug!("creating root actor of type {}", typ);
-                let props = AugieActor::props();
-                let new_actor = sys_shared.actor_of(props, &typ).unwrap();
-                roots_shared.insert(typ.to_string(), new_actor.clone());
-                new_actor
-            }
-        };
+            // Check for a specific one.
+            let mut roots_shared = roots_shared1.lock().unwrap();
+            let actor = match roots_shared.get(&typ) {
+                Some(actor) => actor.clone(),
+                None => {
+                    debug!("creating root actor of type {}", typ);
+                    let props = AugieActor::props();
+                    let new_actor = sys_shared.actor_of(props, &typ).unwrap();
+                    roots_shared.insert(typ.to_string(), new_actor.clone());
+                    new_actor
+                }
+            };
 
-        let sys = sys_shared.borrow().deref();
-        let res: RemoteHandle<AuMsg<String>> = ask(sys, &actor, msg);
-        let response = block_on(res);
+            let sys = sys_shared.borrow().deref();
+            let res: RemoteHandle<AuMsg<String>> = ask(sys, &actor, msg);
+            let response = block_on(res);
 
-        //ejs todo result in json:
-        format!("Hi {} {}!", typ, response.msg)
-    });
+            //ejs todo result in json:
+            format!("Hi {} {}!", typ, response.msg)
+        });
 
     // 2nd level actors, ie: an actor type and an instance id that is the child of a root actor.
     let actor2_level = path!("actor" / String / String / String / String).map(

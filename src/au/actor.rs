@@ -9,8 +9,8 @@
 extern crate env_logger;
 extern crate log;
 
-use riker::actors::*;
 use log::{debug, error};
+use riker::actors::*;
 
 use crate::au::msg::AuMsg;
 
@@ -20,7 +20,6 @@ impl Actor for AugieActor {
     type Msg = AuMsg<String>;
 
     fn recv(&mut self, ctx: &Context<AuMsg<String>>, msg: AuMsg<String>, sender: Sender) {
-
         if !msg.path.is_empty() {
             let fmsg = AuMsg {
                 msg: msg.msg,
@@ -30,18 +29,20 @@ impl Actor for AugieActor {
 
             match msg.path.get(0) {
                 Some(typ) => {
-                    debug!("{} received msg addressed to child named {}", ctx.myself.name(), typ);
-                    let child = ctx.myself.children().find(|x| {
-                        x.name() == typ
-                    });
+                    debug!(
+                        "{} received msg addressed to child named {}",
+                        ctx.myself.name(),
+                        typ
+                    );
+                    let child = ctx.myself.children().find(|x| x.name() == typ);
                     match child {
                         Some(sel) => {
                             debug!("forwarding to existing child of type {}", typ);
                             match sel.try_tell(fmsg, sender) {
                                 Ok(_) => debug!("sent"),
-                                _ => debug!("not sent")
+                                _ => debug!("not sent"),
                             }
-                        },
+                        }
                         _ => {
                             debug!("creating child actor of type {}", typ);
                             let props = AugieActor::props();
@@ -49,8 +50,8 @@ impl Actor for AugieActor {
                             new_actor.tell(fmsg, sender);
                         }
                     };
-                },
-                None => error!("path error: {}", ctx.myself.name())
+                }
+                None => error!("path error: {}", ctx.myself.name()),
             }
         } else {
             debug!("{} received msg addressed to itself", ctx.myself.name());

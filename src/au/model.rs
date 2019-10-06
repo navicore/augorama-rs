@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone)]
 pub enum AuCmd {
     Get,
-    //Set,
+    Set,
     //Ls,
 }
 
@@ -28,8 +28,7 @@ pub struct AuTelemetry {
 
 impl std::fmt::Debug for AuTelemetry {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        //t => write!(f, "Get"),
-        write!(f, "haha")
+        write!(f, "({} {:?} {:?})", self.name, self.value, self.datetime)
     }
 }
 
@@ -75,7 +74,7 @@ impl std::fmt::Display for AuCmd {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             AuCmd::Get => write!(f, "Get"),
-            //AugieCmd::Set => write!(f, "Set"),
+            AuCmd::Set => write!(f, "Set"),
             //AugieCmd::Ls => write!(f, "Set"),
         }
     }
@@ -85,7 +84,7 @@ impl std::fmt::Debug for AuCmd {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             AuCmd::Get => write!(f, "Get"),
-            //AugieCmd::Set => write!(f, "Set"),
+            AuCmd::Set => write!(f, "Set"),
             //AugieCmd::Ls => write!(f, "Set"),
         }
     }

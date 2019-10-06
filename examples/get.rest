@@ -4,6 +4,10 @@ Content-Type: application/json; charset=utf-8
 --
 
 --
+POST /actor/person/Mary
+[{"name": "my.name", "value": 1.0, "datetime": "2019-10-06T13:20:16Z"}]
+
+--
 GET /actor/person/Mary
 
 --

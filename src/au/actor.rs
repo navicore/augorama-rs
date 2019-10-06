@@ -72,6 +72,8 @@ impl Actor for AugieActor {
             // else it is mine
             debug!("{} received msg", ctx.myself.name());
 
+            // ejs todo: inspect type for get/set/jrnl
+
             let response = AuMsg { msg: Some(self.state.state.clone()), ..msg };
             let result = sender
                 .unwrap()
@@ -81,21 +83,6 @@ impl Actor for AugieActor {
                 Err(_) => error!("NOT sent"),
             }
 
-//            match serde_json::to_string(&self.state) {
-//                Ok(json) => {
-//                    let response = AuMsg { msg: Some(self.state.state.clone()), ..msg };
-//                    let result = sender
-//                        .unwrap()
-//                        .try_tell(response, Some(ctx.myself().into()));
-//                    match result {
-//                        Ok(_) => debug!("{} sent reply", ctx.myself.name()),
-//                        Err(_) => error!("NOT sent"),
-//                    }
-//                }
-//                Err(_) => {
-//                    error!("can not serialize state");
-//                }
-//            }
         }
     }
 }

@@ -43,11 +43,13 @@ use crate::au::model::{AuMsg, AuTelemetry};
 
 pub mod au;
 
+type AuActorRef = ActorRef<AuMsg<Vec<AuTelemetry>>>;
+
 fn create_actor_and_wait(
     root: String,
     path: Vec<String>,
     sys_shared: MutexGuard<ActorSystem>,
-    mut roots_shared: MutexGuard<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>, RandomState>>,
+    mut roots_shared: MutexGuard<HashMap<String, AuActorRef, RandomState>>,
 ) -> Option<Vec<AuTelemetry>> {
     let msg: AuMsg<Vec<AuTelemetry>> = AuMsg {
         msg: None,
@@ -78,6 +80,8 @@ fn create_actor_and_wait(
 
 /// blocking call to run server.  server will open a port and expect http requests.
 pub fn serve() {
+    type ActorRoots = Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>>;
+
     env_logger::init();
     info!("starting actor space");
 
@@ -87,20 +91,13 @@ pub fn serve() {
     let sys_shared3 = sys.clone();
     let sys_shared4 = sys.clone();
     let sys_shared5 = sys.clone();
+    let roots: ActorRoots = Arc::new(Mutex::new(HashMap::new()));
 
-    let roots: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> =
-        Arc::new(Mutex::new(HashMap::new()));
-
-    let roots_shared1: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> =
-        roots.clone();
-    let roots_shared2: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> =
-        roots.clone();
-    let roots_shared3: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> =
-        roots.clone();
-    let roots_shared4: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> =
-        roots.clone();
-    let roots_shared5: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> =
-        roots.clone();
+    let roots_shared1 = roots.clone();
+    let roots_shared2 = roots.clone();
+    let roots_shared3 = roots.clone();
+    let roots_shared4 = roots.clone();
+    let roots_shared5 = roots.clone();
 
     let route2 = warp::path("actor")
         .and(warp::path::param::<String>())

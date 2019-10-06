@@ -12,11 +12,9 @@ extern crate log;
 use log::{debug, error};
 use riker::actors::*;
 
-use crate::au::msg::AuMsg;
+use crate::au::model::{AuMsg, AuState, AuTelemetry};
 
-pub struct AugieActor;
-
-fn fwd(ctx: &Context<AuMsg<String>>, msg: AuMsg<String>, sender: Sender) {
+fn fwd(ctx: &Context<AuMsg<Vec<AuTelemetry>>>, msg: AuMsg<Vec<AuTelemetry>>, sender: Sender) {
     let fmsg = AuMsg {
         path: msg.path.clone().split_off(1),
         ..msg
@@ -59,17 +57,35 @@ fn fwd(ctx: &Context<AuMsg<String>>, msg: AuMsg<String>, sender: Sender) {
     }
 }
 
-impl Actor for AugieActor {
-    type Msg = AuMsg<String>;
+pub struct AugieActor {
+    state: AuState,
+}
 
-    fn recv(&mut self, ctx: &Context<AuMsg<String>>, msg: AuMsg<String>, sender: Sender) {
+impl Actor for AugieActor {
+    type Msg = AuMsg<Vec<AuTelemetry>>;
+
+    fn recv(
+        &mut self,
+        ctx: &Context<AuMsg<Vec<AuTelemetry>>>,
+        msg: AuMsg<Vec<AuTelemetry>>,
+        sender: Sender,
+    ) {
         if !msg.path.is_empty() {
             // it is a msg to a child
             fwd(ctx, msg, sender);
         } else {
             // else it is mine
             debug!("{} received msg", ctx.myself.name());
-            let result = sender.unwrap().try_tell(msg, Some(ctx.myself().into()));
+
+            // ejs todo: inspect type for get/set/jrnl
+
+            let response = AuMsg {
+                msg: Some(self.state.state.clone()),
+                ..msg
+            };
+            let result = sender
+                .unwrap()
+                .try_tell(response, Some(ctx.myself().into()));
             match result {
                 Ok(_) => debug!("{} sent reply", ctx.myself.name()),
                 Err(_) => error!("NOT sent"),
@@ -80,7 +96,9 @@ impl Actor for AugieActor {
 
 impl AugieActor {
     fn actor() -> Self {
-        AugieActor
+        AugieActor {
+            state: AuState { state: Vec::new() },
+        }
     }
     pub fn props() -> BoxActorProd<AugieActor> {
         Props::new(AugieActor::actor)

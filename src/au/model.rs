@@ -6,6 +6,7 @@
 //! value.
 
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone)]
 pub enum AuCmd {
@@ -15,7 +16,7 @@ pub enum AuCmd {
 }
 
 /// The single data structure representing the source of all actor state.
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct AuTelemetry {
     /// UTC TZ 8601 format that is ideally a representation of when the observation was made in the real world
     pub datetime: DateTime<Utc>,
@@ -23,6 +24,13 @@ pub struct AuTelemetry {
     pub name: String,
     /// a double, ie: `22.9`
     pub value: f64,
+}
+
+impl std::fmt::Debug for AuTelemetry {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        //t => write!(f, "Get"),
+        write!(f, "haha")
+    }
 }
 
 impl Default for AuTelemetry {
@@ -35,13 +43,21 @@ impl Default for AuTelemetry {
     }
 }
 
-#[derive(Clone)]
+/// Actors keep their state in collections of telemetry records - some derived and some
+/// are meters (last update).
+#[derive(Clone, Serialize, Deserialize)]
+pub struct AuState {
+    pub state: Vec<AuTelemetry>,
+}
+
+#[derive(Clone, Debug)]
 pub struct AuMsg<T> {
     pub cmd: AuCmd,
-    pub msg: T,
+    pub msg: Option<T>,
     pub path: Vec<String>,
 }
 
+/*
 impl std::fmt::Display for AuMsg<String> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "(msg: {} cmd: {} path: ?)", self.msg, self.cmd)
@@ -53,6 +69,7 @@ impl std::fmt::Debug for AuMsg<String> {
         write!(f, "(msg: {} cmd: {} path: ?)", self.msg, self.cmd)
     }
 }
+*/
 
 impl std::fmt::Display for AuCmd {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -76,7 +93,7 @@ impl std::fmt::Debug for AuCmd {
 
 #[cfg(test)]
 mod tests {
-    use crate::au::msg::*;
+    use crate::au::model::*;
 
     #[test]
     fn default_works() {
@@ -87,8 +104,8 @@ mod tests {
 
     #[test]
     fn path_inspect_works() {
-        let m = AuMsg {
-            msg: "myid",
+        let m: AuMsg<Vec<AuTelemetry>> = AuMsg {
+            msg: None,
             cmd: AuCmd::Get,
             path: vec![
                 "root".to_string(),

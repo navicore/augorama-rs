@@ -12,7 +12,9 @@ extern crate log;
 use log::{debug, error};
 use riker::actors::*;
 
+use crate::au::model::AuCmd::*;
 use crate::au::model::{AuMsg, AuState, AuTelemetry};
+use std::collections::HashMap;
 
 fn fwd(ctx: &Context<AuMsg<Vec<AuTelemetry>>>, msg: AuMsg<Vec<AuTelemetry>>, sender: Sender) {
     let fmsg = AuMsg {
@@ -77,18 +79,27 @@ impl Actor for AugieActor {
             // else it is mine
             debug!("{} received msg", ctx.myself.name());
 
-            // ejs todo: inspect type for get/set/jrnl
-
-            let response = AuMsg {
-                msg: Some(self.state.state.clone()),
-                ..msg
-            };
-            let result = sender
-                .unwrap()
-                .try_tell(response, Some(ctx.myself().into()));
-            match result {
-                Ok(_) => debug!("{} sent reply", ctx.myself.name()),
-                Err(_) => error!("NOT sent"),
+            if msg.cmd == Set {
+                for t in msg.msg.unwrap().iter() {
+                    self.state.state.insert(t.name.clone(), t.clone());
+                    debug!("{} updated state", ctx.myself.name());
+                }
+            } else {
+                let mut v: Vec<AuTelemetry> = Vec::new();
+                for (_, val) in self.state.state.iter_mut() {
+                    v.push(val.clone());
+                }
+                let response = AuMsg {
+                    msg: Some(v),
+                    ..msg
+                };
+                let result = sender
+                    .unwrap()
+                    .try_tell(response, Some(ctx.myself().into()));
+                match result {
+                    Ok(_) => debug!("{} sent state in reply to Get", ctx.myself.name()),
+                    Err(_) => error!("state NOT sent"),
+                }
             }
         }
     }
@@ -97,7 +108,9 @@ impl Actor for AugieActor {
 impl AugieActor {
     fn actor() -> Self {
         AugieActor {
-            state: AuState { state: Vec::new() },
+            state: AuState {
+                state: HashMap::new(),
+            },
         }
     }
     pub fn props() -> BoxActorProd<AugieActor> {

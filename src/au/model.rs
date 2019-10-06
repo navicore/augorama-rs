@@ -7,8 +7,9 @@
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum AuCmd {
     Get,
     Set,
@@ -46,7 +47,7 @@ impl Default for AuTelemetry {
 /// are meters (last update).
 #[derive(Clone, Serialize, Deserialize)]
 pub struct AuState {
-    pub state: Vec<AuTelemetry>,
+    pub state: HashMap<String, AuTelemetry>,
 }
 
 #[derive(Clone, Debug)]

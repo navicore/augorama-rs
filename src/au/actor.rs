@@ -12,7 +12,7 @@ extern crate log;
 use log::{debug, error};
 use riker::actors::*;
 
-use crate::au::model::AuCmd::*;
+use crate::au::model::AuOperator::*;
 use crate::au::model::{AuMsg, AuState, AuTelemetry};
 use std::collections::HashMap;
 
@@ -79,8 +79,8 @@ impl Actor for AugieActor {
             // else it is mine
             debug!("{} received msg", ctx.myself.name());
 
-            if msg.cmd == Set {
-                for t in msg.msg.unwrap().iter() {
+            if msg.op == Tell {
+                for t in msg.data.unwrap().iter() {
                     self.state.state.insert(t.name.clone(), t.clone());
                     debug!("{} updated state", ctx.myself.name());
                 }
@@ -90,7 +90,7 @@ impl Actor for AugieActor {
                     v.push(val.clone());
                 }
                 let response = AuMsg {
-                    msg: Some(v),
+                    data: Some(v),
                     ..msg
                 };
                 let result = sender

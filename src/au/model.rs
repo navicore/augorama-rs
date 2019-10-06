@@ -9,11 +9,10 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Clone, PartialEq)]
-pub enum AuCmd {
-    Get,
-    Set,
-    //Ls,
+#[derive(Clone, PartialEq, Debug)]
+pub enum AuOperator {
+    Ask,
+    Tell,
 }
 
 /// The single data structure representing the source of all actor state.
@@ -52,40 +51,16 @@ pub struct AuState {
 
 #[derive(Clone, Debug)]
 pub struct AuMsg<T> {
-    pub cmd: AuCmd,
-    pub msg: Option<T>,
+    pub op: AuOperator,
+    pub data: Option<T>,
     pub path: Vec<String>,
 }
 
-/*
-impl std::fmt::Display for AuMsg<String> {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "(msg: {} cmd: {} path: ?)", self.msg, self.cmd)
-    }
-}
-
-impl std::fmt::Debug for AuMsg<String> {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "(msg: {} cmd: {} path: ?)", self.msg, self.cmd)
-    }
-}
-*/
-
-impl std::fmt::Display for AuCmd {
+impl std::fmt::Display for AuOperator {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            AuCmd::Get => write!(f, "Get"),
-            AuCmd::Set => write!(f, "Set"),
-            //AugieCmd::Ls => write!(f, "Set"),
-        }
-    }
-}
-
-impl std::fmt::Debug for AuCmd {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            AuCmd::Get => write!(f, "Get"),
-            AuCmd::Set => write!(f, "Set"),
+            AuOperator::Ask => write!(f, "Get"),
+            AuOperator::Tell => write!(f, "Set"),
             //AugieCmd::Ls => write!(f, "Set"),
         }
     }
@@ -105,8 +80,8 @@ mod tests {
     #[test]
     fn path_inspect_works() {
         let m: AuMsg<Vec<AuTelemetry>> = AuMsg {
-            msg: None,
-            cmd: AuCmd::Get,
+            data: None,
+            op: AuOperator::Ask,
             path: vec![
                 "root".to_string(),
                 "actors".to_string(),

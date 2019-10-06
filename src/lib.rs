@@ -38,8 +38,8 @@ use riker_patterns::ask::*;
 use warp::{self, Filter};
 
 use crate::au::actor::AugieActor;
-use crate::au::model::AuCmd;
-use crate::au::model::AuCmd::Get;
+use crate::au::model::AuOperator;
+use crate::au::model::AuOperator::Ask;
 use crate::au::model::{AuMsg, AuTelemetry};
 
 pub mod au;
@@ -49,13 +49,17 @@ type AuActorRef = ActorRef<AuMsg<Vec<AuTelemetry>>>;
 fn tell_actor(
     root: String,
     path: Vec<String>,
-    cmd: AuCmd,
+    cmd: AuOperator,
     msg: Option<Vec<AuTelemetry>>,
     sys_shared: MutexGuard<ActorSystem>,
     mut roots_shared: MutexGuard<HashMap<String, AuActorRef, RandomState>>,
 ) -> String {
     debug!("handling Tell {} {} {:?}", cmd, root, path);
-    let aumsg: AuMsg<Vec<AuTelemetry>> = AuMsg { msg, cmd, path };
+    let aumsg: AuMsg<Vec<AuTelemetry>> = AuMsg {
+        data: msg,
+        op: cmd,
+        path,
+    };
 
     let actor = match roots_shared.get(&root) {
         Some(actor) => {
@@ -79,13 +83,17 @@ fn tell_actor(
 fn ask_actor(
     root: String,
     path: Vec<String>,
-    cmd: AuCmd,
+    cmd: AuOperator,
     msg: Option<Vec<AuTelemetry>>,
     sys_shared: MutexGuard<ActorSystem>,
     mut roots_shared: MutexGuard<HashMap<String, AuActorRef, RandomState>>,
 ) -> Option<Vec<AuTelemetry>> {
     debug!("handling Ask {} {} {:?}", cmd, root, path);
-    let aumsg: AuMsg<Vec<AuTelemetry>> = AuMsg { msg, cmd, path };
+    let aumsg: AuMsg<Vec<AuTelemetry>> = AuMsg {
+        data: msg,
+        op: cmd,
+        path,
+    };
 
     let actor = match roots_shared.get(&root) {
         Some(actor) => {
@@ -105,7 +113,7 @@ fn ask_actor(
     let res: RemoteHandle<AuMsg<Vec<AuTelemetry>>> = ask(sys, &actor, aumsg);
     let response = block_on(res);
 
-    response.msg
+    response.data
 }
 
 /// blocking call to run server.  server will open a port and expect http requests.
@@ -149,7 +157,7 @@ pub fn serve() {
                 tell_actor(
                     root_typ,
                     vec![id],
-                    AuCmd::Set,
+                    AuOperator::Tell,
                     Some(json),
                     sys_shared1p.lock().unwrap(),
                     roots_shared1p.lock().unwrap(),
@@ -175,7 +183,7 @@ pub fn serve() {
                 tell_actor(
                     root_typ,
                     vec![root_id.clone(), child_typ.clone(), id.clone()],
-                    AuCmd::Set,
+                    AuOperator::Tell,
                     Some(json),
                     sys_shared2p.lock().unwrap(),
                     roots_shared2p.lock().unwrap(),
@@ -217,7 +225,7 @@ pub fn serve() {
                         child_typ.clone(),
                         id.clone(),
                     ],
-                    AuCmd::Set,
+                    AuOperator::Tell,
                     Some(json),
                     sys_shared3p.lock().unwrap(),
                     roots_shared3p.lock().unwrap(),
@@ -259,7 +267,7 @@ pub fn serve() {
                         child_typ.clone(),
                         id.clone(),
                     ],
-                    AuCmd::Set,
+                    AuOperator::Tell,
                     Some(json),
                     sys_shared4p.lock().unwrap(),
                     roots_shared4p.lock().unwrap(),
@@ -307,7 +315,7 @@ pub fn serve() {
                         child_typ.clone(),
                         id.clone(),
                     ],
-                    AuCmd::Set,
+                    AuOperator::Tell,
                     Some(json),
                     sys_shared5p.lock().unwrap(),
                     roots_shared5p.lock().unwrap(),
@@ -325,7 +333,7 @@ pub fn serve() {
                 ask_actor(
                     root_typ,
                     vec![id],
-                    Get,
+                    Ask,
                     None,
                     sys_shared1.lock().unwrap(),
                     roots_shared1.lock().unwrap(),
@@ -349,7 +357,7 @@ pub fn serve() {
                 ask_actor(
                     root_typ,
                     vec![root_id.clone(), child_typ.clone(), id.clone()],
-                    Get,
+                    Ask,
                     None,
                     sys_shared2.lock().unwrap(),
                     roots_shared2.lock().unwrap(),
@@ -383,7 +391,7 @@ pub fn serve() {
                         child_typ.clone(),
                         id.clone(),
                     ],
-                    Get,
+                    Ask,
                     None,
                     sys_shared3.lock().unwrap(),
                     roots_shared3.lock().unwrap(),
@@ -429,7 +437,7 @@ pub fn serve() {
                         child_typ.clone(),
                         id.clone(),
                     ],
-                    Get,
+                    Ask,
                     None,
                     sys_shared4.lock().unwrap(),
                     roots_shared4.lock().unwrap(),
@@ -481,7 +489,7 @@ pub fn serve() {
                         child_typ.clone(),
                         id.clone(),
                     ],
-                    Get,
+                    Ask,
                     None,
                     sys_shared5.lock().unwrap(),
                     roots_shared5.lock().unwrap(),

@@ -27,7 +27,6 @@ pub struct AuTelemetry {
 }
 
 impl std::fmt::Debug for AuTelemetry {
-
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         //t => write!(f, "Get"),
         write!(f, "haha")

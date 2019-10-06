@@ -64,7 +64,12 @@ pub struct AugieActor {
 impl Actor for AugieActor {
     type Msg = AuMsg<Vec<AuTelemetry>>;
 
-    fn recv(&mut self, ctx: &Context<AuMsg<Vec<AuTelemetry>>>, msg: AuMsg<Vec<AuTelemetry>>, sender: Sender) {
+    fn recv(
+        &mut self,
+        ctx: &Context<AuMsg<Vec<AuTelemetry>>>,
+        msg: AuMsg<Vec<AuTelemetry>>,
+        sender: Sender,
+    ) {
         if !msg.path.is_empty() {
             // it is a msg to a child
             fwd(ctx, msg, sender);
@@ -74,7 +79,10 @@ impl Actor for AugieActor {
 
             // ejs todo: inspect type for get/set/jrnl
 
-            let response = AuMsg { msg: Some(self.state.state.clone()), ..msg };
+            let response = AuMsg {
+                msg: Some(self.state.state.clone()),
+                ..msg
+            };
             let result = sender
                 .unwrap()
                 .try_tell(response, Some(ctx.myself().into()));
@@ -82,7 +90,6 @@ impl Actor for AugieActor {
                 Ok(_) => debug!("{} sent reply", ctx.myself.name()),
                 Err(_) => error!("NOT sent"),
             }
-
         }
     }
 }

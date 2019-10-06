@@ -92,25 +92,32 @@ pub fn serve() {
     let roots: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> =
         Arc::new(Mutex::new(HashMap::new()));
 
-    let roots_shared1: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> = roots.clone();
-    let roots_shared2: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> = roots.clone();
-    let roots_shared3: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> = roots.clone();
-    let roots_shared4: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> = roots.clone();
-    let roots_shared5: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> = roots.clone();
+    let roots_shared1: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> =
+        roots.clone();
+    let roots_shared2: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> =
+        roots.clone();
+    let roots_shared3: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> =
+        roots.clone();
+    let roots_shared4: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> =
+        roots.clone();
+    let roots_shared5: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> =
+        roots.clone();
 
     let route2 = warp::path("actor")
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
-        .map(move |root_typ: String, id: String| -> Option<Vec<AuTelemetry>> {
-            create_actor_and_wait(
-                root_typ,
-                id.clone(),
-                vec![id],
-                sys_shared1.lock().unwrap(),
-                roots_shared1.lock().unwrap(),
-            )
-        })
-        .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| { warp::reply::json(&reply) });
+        .map(
+            move |root_typ: String, id: String| -> Option<Vec<AuTelemetry>> {
+                create_actor_and_wait(
+                    root_typ,
+                    id.clone(),
+                    vec![id],
+                    sys_shared1.lock().unwrap(),
+                    roots_shared1.lock().unwrap(),
+                )
+            },
+        )
+        .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| warp::reply::json(&reply));
 
     let route4 = warp::path("actor")
         .and(warp::path::param::<String>())
@@ -118,7 +125,11 @@ pub fn serve() {
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .map(
-            move |root_typ: String, root_id: String, child_typ: String, id: String| -> Option<Vec<AuTelemetry>> {
+            move |root_typ: String,
+                  root_id: String,
+                  child_typ: String,
+                  id: String|
+                  -> Option<Vec<AuTelemetry>> {
                 create_actor_and_wait(
                     root_typ,
                     id.clone(),
@@ -128,7 +139,7 @@ pub fn serve() {
                 )
             },
         )
-        .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| { warp::reply::json(&reply) });
+        .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| warp::reply::json(&reply));
 
     let route6 = warp::path("actor")
         .and(warp::path::param::<String>())
@@ -160,7 +171,7 @@ pub fn serve() {
                 )
             },
         )
-        .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| { warp::reply::json(&reply) });
+        .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| warp::reply::json(&reply));
 
     let route8 = warp::path("actor")
         .and(warp::path::param::<String>())
@@ -204,7 +215,7 @@ pub fn serve() {
                 )
             },
         )
-        .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| { warp::reply::json(&reply) });
+        .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| warp::reply::json(&reply));
 
     let route10 = warp::path("actor")
         .and(warp::path::param::<String>())
@@ -254,7 +265,7 @@ pub fn serve() {
                 )
             },
         )
-        .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| { warp::reply::json(&reply) });
+        .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| warp::reply::json(&reply));
 
     let routes = route10.or(route8.or(route6.or(route4.or(route2))));
     warp::serve(routes).run(([127, 0, 0, 1], 3030));

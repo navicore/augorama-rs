@@ -44,8 +44,7 @@ use crate::au::model::{AuMsg, AuTelemetry};
 pub mod au;
 
 fn create_actor_and_wait(
-    typ: String,
-    id: String,
+    root: String,
     path: Vec<String>,
     sys_shared: MutexGuard<ActorSystem>,
     mut roots_shared: MutexGuard<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>, RandomState>>,
@@ -56,16 +55,16 @@ fn create_actor_and_wait(
         path,
     };
 
-    let actor = match roots_shared.get(&typ) {
+    let actor = match roots_shared.get(&root) {
         Some(actor) => {
-            debug!("found existing root {}", typ);
+            debug!("found existing root {}", root);
             actor.clone()
         }
         None => {
-            debug!("creating root {}", typ);
+            debug!("creating root {}", root);
             let props = AugieActor::props();
-            let new_actor = sys_shared.actor_of(props, &typ).unwrap();
-            roots_shared.insert(typ.to_string(), new_actor.clone());
+            let new_actor = sys_shared.actor_of(props, &root).unwrap();
+            roots_shared.insert(root.to_string(), new_actor.clone());
             new_actor
         }
     };
@@ -110,7 +109,6 @@ pub fn serve() {
             move |root_typ: String, id: String| -> Option<Vec<AuTelemetry>> {
                 create_actor_and_wait(
                     root_typ,
-                    id.clone(),
                     vec![id],
                     sys_shared1.lock().unwrap(),
                     roots_shared1.lock().unwrap(),
@@ -132,7 +130,6 @@ pub fn serve() {
                   -> Option<Vec<AuTelemetry>> {
                 create_actor_and_wait(
                     root_typ,
-                    id.clone(),
                     vec![root_id.clone(), child_typ.clone(), id.clone()],
                     sys_shared2.lock().unwrap(),
                     roots_shared2.lock().unwrap(),
@@ -158,7 +155,6 @@ pub fn serve() {
                   -> Option<Vec<AuTelemetry>> {
                 create_actor_and_wait(
                     root_typ,
-                    id.clone(),
                     vec![
                         root_id.clone(),
                         child1_typ.clone(),
@@ -198,7 +194,6 @@ pub fn serve() {
                   -> Option<Vec<AuTelemetry>> {
                 create_actor_and_wait(
                     root_typ,
-                    id.clone(),
                     vec![
                         root_id.clone(),
                         child1_typ.clone(),
@@ -246,7 +241,6 @@ pub fn serve() {
                   -> Option<Vec<AuTelemetry>> {
                 create_actor_and_wait(
                     root_typ,
-                    id.clone(),
                     vec![
                         root_id.clone(),
                         child1_typ.clone(),

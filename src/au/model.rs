@@ -104,7 +104,7 @@ mod tests {
 
     #[test]
     fn path_inspect_works() {
-        let m = AuMsg {
+        let m: AuMsg<Vec<AuTelemetry>> = AuMsg {
             msg: None,
             cmd: AuCmd::Get,
             path: vec![

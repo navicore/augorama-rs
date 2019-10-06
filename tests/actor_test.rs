@@ -14,7 +14,7 @@ fn actor_messaging_works() {
 
     match reqwest::get("http://localhost:3030/actor/person/Mary") {
         Ok(mut result) => match result.text() {
-            Ok(t) => assert_eq!(t, "{\"state\":[]}"),
+            Ok(t) => assert_eq!(t, "[]"),
             Err(_) => assert!(false),
         },
         Err(_) => assert!(false),

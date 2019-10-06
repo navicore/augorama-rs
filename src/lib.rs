@@ -35,11 +35,11 @@ use log::{debug, info};
 use riker::actors::*;
 use riker::system::ActorSystem;
 use riker_patterns::ask::*;
-use warp::{self, path, Filter};
+use warp::{self, Filter};
 
 use crate::au::actor::AugieActor;
-use crate::au::msg::AuCmd::Get;
-use crate::au::msg::AuMsg;
+use crate::au::model::AuCmd::Get;
+use crate::au::model::{AuMsg, AuTelemetry};
 
 pub mod au;
 
@@ -48,10 +48,10 @@ fn create_actor_and_wait(
     id: String,
     path: Vec<String>,
     sys_shared: MutexGuard<ActorSystem>,
-    mut roots_shared: MutexGuard<HashMap<String, ActorRef<AuMsg<String>>, RandomState>>,
-) -> String {
-    let msg: AuMsg<String> = AuMsg {
-        msg: id.clone(),
+    mut roots_shared: MutexGuard<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>, RandomState>>,
+) -> Option<Vec<AuTelemetry>> {
+    let msg: AuMsg<Vec<AuTelemetry>> = AuMsg {
+        msg: None,
         cmd: Get,
         path,
     };
@@ -71,14 +71,10 @@ fn create_actor_and_wait(
     };
 
     let sys = sys_shared.borrow().deref();
-    let res: RemoteHandle<AuMsg<String>> = ask(sys, &actor, msg);
+    let res: RemoteHandle<AuMsg<Vec<AuTelemetry>>> = ask(sys, &actor, msg);
     let response = block_on(res);
 
-    //ejs todo result in json:
-    //ejs todo result in json:
-    //ejs todo result in json:
-    //ejs todo result in json:
-    format!("Hi {} {}!", typ, response.msg)
+    response.msg
 }
 
 /// blocking call to run server.  server will open a port and expect http requests.
@@ -93,18 +89,19 @@ pub fn serve() {
     let sys_shared4 = sys.clone();
     let sys_shared5 = sys.clone();
 
-    let roots: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> =
+    let roots: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> =
         Arc::new(Mutex::new(HashMap::new()));
 
-    let roots_shared1: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> = roots.clone();
-    let roots_shared2: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> = roots.clone();
-    let roots_shared3: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> = roots.clone();
-    let roots_shared4: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> = roots.clone();
-    let roots_shared5: Arc<Mutex<HashMap<String, ActorRef<AuMsg<String>>>>> = roots.clone();
+    let roots_shared1: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> = roots.clone();
+    let roots_shared2: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> = roots.clone();
+    let roots_shared3: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> = roots.clone();
+    let roots_shared4: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> = roots.clone();
+    let roots_shared5: Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>> = roots.clone();
 
-    // route for root level actors, ie: an actor type and an instance id
-    let route2 =
-        path!("actor" / String / String).map(move |root_typ: String, id: String| -> String {
+    let route2 = warp::path("actor")
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .map(move |root_typ: String, id: String| -> Option<Vec<AuTelemetry>> {
             create_actor_and_wait(
                 root_typ,
                 id.clone(),
@@ -112,56 +109,82 @@ pub fn serve() {
                 sys_shared1.lock().unwrap(),
                 roots_shared1.lock().unwrap(),
             )
-        });
+        })
+        .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| { warp::reply::json(&reply) });
 
-    // 2nd level actors, ie: an actor type and an instance id that is the child of a root actor.
-    let route4 = path!("actor" / String / String / String / String).map(
-        move |root_typ: String, root_id: String, child_typ: String, id: String| -> String {
-            create_actor_and_wait(
-                root_typ,
-                id.clone(),
-                vec![root_id.clone(), child_typ.clone(), id.clone()],
-                sys_shared2.lock().unwrap(),
-                roots_shared2.lock().unwrap(),
-            )
-        },
-    );
-
-    let route6 = path!("actor" / String / String / String / String / String / String).map(
-        move |root_typ: String,
-              root_id: String,
-              child1_typ: String,
-              child1_id: String,
-              child_typ: String,
-              id: String|
-              -> String {
-            create_actor_and_wait(
-                root_typ,
-                id.clone(),
-                vec![
-                    root_id.clone(),
-                    child1_typ.clone(),
-                    child1_id.clone(),
-                    child_typ.clone(),
+    let route4 = warp::path("actor")
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .map(
+            move |root_typ: String, root_id: String, child_typ: String, id: String| -> Option<Vec<AuTelemetry>> {
+                create_actor_and_wait(
+                    root_typ,
                     id.clone(),
-                ],
-                sys_shared3.lock().unwrap(),
-                roots_shared3.lock().unwrap(),
-            )
-        },
-    );
+                    vec![root_id.clone(), child_typ.clone(), id.clone()],
+                    sys_shared2.lock().unwrap(),
+                    roots_shared2.lock().unwrap(),
+                )
+            },
+        )
+        .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| { warp::reply::json(&reply) });
 
-    let route8 =
-        path!("actor" / String / String / String / String / String / String / String / String).map(
+    let route6 = warp::path("actor")
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .map(
+            move |root_typ: String,
+                  root_id: String,
+                  child1_typ: String,
+                  child1_id: String,
+                  child_typ: String,
+                  id: String|
+                  -> Option<Vec<AuTelemetry>> {
+                create_actor_and_wait(
+                    root_typ,
+                    id.clone(),
+                    vec![
+                        root_id.clone(),
+                        child1_typ.clone(),
+                        child1_id.clone(),
+                        child_typ.clone(),
+                        id.clone(),
+                    ],
+                    sys_shared3.lock().unwrap(),
+                    roots_shared3.lock().unwrap(),
+                )
+            },
+        )
+        .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| { warp::reply::json(&reply) });
+
+    let route8 = warp::path("actor")
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .map(
             move |root_typ: String,
                   root_id: String,
                   child1_typ: String,
                   child1_id: String,
                   child2_typ: String,
                   child2_id: String,
+                  child3_typ: String,
+                  child3_id: String,
                   child_typ: String,
                   id: String|
-                  -> String {
+                  -> Option<Vec<AuTelemetry>> {
                 create_actor_and_wait(
                     root_typ,
                     id.clone(),
@@ -171,6 +194,8 @@ pub fn serve() {
                         child1_id.clone(),
                         child2_typ.clone(),
                         child2_id.clone(),
+                        child3_typ.clone(),
+                        child3_id.clone(),
                         child_typ.clone(),
                         id.clone(),
                     ],
@@ -178,52 +203,58 @@ pub fn serve() {
                     roots_shared4.lock().unwrap(),
                 )
             },
-        );
+        )
+        .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| { warp::reply::json(&reply) });
 
-    let route10 = path!(
-        "actor"
-            / String
-            / String
-            / String
-            / String
-            / String
-            / String
-            / String
-            / String
-            / String
-            / String
-    )
-    .map(
-        move |root_typ: String,
-              root_id: String,
-              child1_typ: String,
-              child1_id: String,
-              child2_typ: String,
-              child2_id: String,
-              child3_typ: String,
-              child3_id: String,
-              child_typ: String,
-              id: String|
-              -> String {
-            create_actor_and_wait(
-                root_typ,
-                id.clone(),
-                vec![
-                    root_id.clone(),
-                    child1_typ.clone(),
-                    child1_id.clone(),
-                    child2_typ.clone(),
-                    child2_id.clone(),
-                    child3_typ.clone(),
-                    child3_id.clone(),
-                    child_typ.clone(),
+    let route10 = warp::path("actor")
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .map(
+            move |root_typ: String,
+                  root_id: String,
+                  child1_typ: String,
+                  child1_id: String,
+                  child2_typ: String,
+                  child2_id: String,
+                  child3_typ: String,
+                  child3_id: String,
+                  child4_typ: String,
+                  child4_id: String,
+                  child_typ: String,
+                  id: String|
+                  -> Option<Vec<AuTelemetry>> {
+                create_actor_and_wait(
+                    root_typ,
                     id.clone(),
-                ],
-                sys_shared5.lock().unwrap(),
-                roots_shared5.lock().unwrap(),
-            )
-        },
-    );
+                    vec![
+                        root_id.clone(),
+                        child1_typ.clone(),
+                        child1_id.clone(),
+                        child2_typ.clone(),
+                        child2_id.clone(),
+                        child3_typ.clone(),
+                        child3_id.clone(),
+                        child4_typ.clone(),
+                        child4_id.clone(),
+                        child_typ.clone(),
+                        id.clone(),
+                    ],
+                    sys_shared5.lock().unwrap(),
+                    roots_shared5.lock().unwrap(),
+                )
+            },
+        )
+        .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| { warp::reply::json(&reply) });
 
     let routes = route10.or(route8.or(route6.or(route4.or(route2))));
     warp::serve(routes).run(([127, 0, 0, 1], 3030));

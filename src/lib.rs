@@ -39,7 +39,7 @@ use warp::{self, Filter};
 
 use crate::au::actor::AugieActor;
 use crate::au::model::AuOperator;
-use crate::au::model::AuOperator::Ask;
+use crate::au::model::AuOperator::*;
 use crate::au::model::{AuMsg, AuTelemetry};
 
 pub mod au;
@@ -54,7 +54,7 @@ fn tell_actor(
     sys_shared: MutexGuard<ActorSystem>,
     mut roots_shared: MutexGuard<HashMap<String, AuActorRef, RandomState>>,
 ) -> String {
-    debug!("handling Tell {} {} {:?}", cmd, root, path);
+    debug!("handling {} {} {:?}", cmd, root, path);
     let aumsg: AuMsg<Vec<AuTelemetry>> = AuMsg {
         data: msg,
         op: cmd,
@@ -80,6 +80,42 @@ fn tell_actor(
     String::from("Accepted")
 }
 
+fn ls_actor(
+    root: String,
+    path: Vec<String>,
+    cmd: AuOperator,
+    msg: Option<Vec<AuTelemetry>>,
+    sys_shared: MutexGuard<ActorSystem>,
+    mut roots_shared: MutexGuard<HashMap<String, AuActorRef, RandomState>>,
+) -> Vec<String> {
+    debug!("handling {} {} {:?}", cmd, root, path);
+    let aumsg: AuMsg<Vec<AuTelemetry>> = AuMsg {
+        data: msg,
+        op: cmd,
+        path,
+    };
+
+    let actor = match roots_shared.get(&root) {
+        Some(actor) => {
+            debug!("found existing root {}", root);
+            actor.clone()
+        }
+        None => {
+            debug!("creating root {}", root);
+            let props = AugieActor::props();
+            let new_actor = sys_shared.actor_of(props, &root).unwrap();
+            roots_shared.insert(root.to_string(), new_actor.clone());
+            new_actor
+        }
+    };
+
+    let sys = sys_shared.borrow().deref();
+    let res: RemoteHandle<AuMsg<Vec<AuTelemetry>>> = ask(sys, &actor, aumsg);
+    let response = block_on(res);
+
+    response.path
+}
+
 fn ask_actor(
     root: String,
     path: Vec<String>,
@@ -88,7 +124,7 @@ fn ask_actor(
     sys_shared: MutexGuard<ActorSystem>,
     mut roots_shared: MutexGuard<HashMap<String, AuActorRef, RandomState>>,
 ) -> Option<Vec<AuTelemetry>> {
-    debug!("handling Ask {} {} {:?}", cmd, root, path);
+    debug!("handling {} {} {:?}", cmd, root, path);
     let aumsg: AuMsg<Vec<AuTelemetry>> = AuMsg {
         data: msg,
         op: cmd,
@@ -124,28 +160,49 @@ pub fn serve() {
     info!("starting actor space");
 
     let sys = Arc::new(Mutex::new(ActorSystem::new().unwrap()));
-    let sys_shared1 = sys.clone();
-    let sys_shared1p = sys.clone();
+    let sys_shared1c = sys.clone();
     let sys_shared2 = sys.clone();
     let sys_shared2p = sys.clone();
-    let sys_shared3 = sys.clone();
-    let sys_shared3p = sys.clone();
+    let sys_shared2c = sys.clone();
+    let sys_shared3c = sys.clone();
     let sys_shared4 = sys.clone();
     let sys_shared4p = sys.clone();
-    let sys_shared5 = sys.clone();
-    let sys_shared5p = sys.clone();
+    let sys_shared4c = sys.clone();
+    let sys_shared5c = sys.clone();
+    let sys_shared6 = sys.clone();
+    let sys_shared6p = sys.clone();
+    let sys_shared6c = sys.clone();
+    let sys_shared7c = sys.clone();
+    let sys_shared8 = sys.clone();
+    let sys_shared8p = sys.clone();
+    let sys_shared8c = sys.clone();
+    let sys_shared9c = sys.clone();
+    let sys_shared10 = sys.clone();
+    let sys_shared10p = sys.clone();
+    let sys_shared10c = sys.clone();
 
     let roots: ActorRoots = Arc::new(Mutex::new(HashMap::new()));
-    let roots_shared1 = roots.clone();
-    let roots_shared1p = roots.clone();
+    let roots_shared0c = roots.clone();
+    let roots_shared1c = roots.clone();
     let roots_shared2 = roots.clone();
     let roots_shared2p = roots.clone();
-    let roots_shared3 = roots.clone();
-    let roots_shared3p = roots.clone();
+    let roots_shared2c = roots.clone();
+    let roots_shared3c = roots.clone();
     let roots_shared4 = roots.clone();
     let roots_shared4p = roots.clone();
-    let roots_shared5 = roots.clone();
-    let roots_shared5p = roots.clone();
+    let roots_shared4c = roots.clone();
+    let roots_shared5c = roots.clone();
+    let roots_shared6 = roots.clone();
+    let roots_shared6p = roots.clone();
+    let roots_shared6c = roots.clone();
+    let roots_shared7c = roots.clone();
+    let roots_shared8 = roots.clone();
+    let roots_shared8p = roots.clone();
+    let roots_shared8c = roots.clone();
+    let roots_shared9c = roots.clone();
+    let roots_shared10 = roots.clone();
+    let roots_shared10p = roots.clone();
+    let roots_shared10c = roots.clone();
 
     let post_route_2 = warp::path("actor")
         .and(warp::post2())
@@ -159,8 +216,8 @@ pub fn serve() {
                     vec![id],
                     AuOperator::Tell,
                     Some(json),
-                    sys_shared1p.lock().unwrap(),
-                    roots_shared1p.lock().unwrap(),
+                    sys_shared2p.lock().unwrap(),
+                    roots_shared2p.lock().unwrap(),
                 )
             },
         )
@@ -185,8 +242,8 @@ pub fn serve() {
                     vec![root_id.clone(), child_typ.clone(), id.clone()],
                     AuOperator::Tell,
                     Some(json),
-                    sys_shared2p.lock().unwrap(),
-                    roots_shared2p.lock().unwrap(),
+                    sys_shared4p.lock().unwrap(),
+                    roots_shared4p.lock().unwrap(),
                 )
             },
         )
@@ -227,8 +284,8 @@ pub fn serve() {
                     ],
                     AuOperator::Tell,
                     Some(json),
-                    sys_shared3p.lock().unwrap(),
-                    roots_shared3p.lock().unwrap(),
+                    sys_shared6p.lock().unwrap(),
+                    roots_shared6p.lock().unwrap(),
                 )
             },
         )
@@ -269,8 +326,8 @@ pub fn serve() {
                     ],
                     AuOperator::Tell,
                     Some(json),
-                    sys_shared4p.lock().unwrap(),
-                    roots_shared4p.lock().unwrap(),
+                    sys_shared8p.lock().unwrap(),
+                    roots_shared8p.lock().unwrap(),
                 )
             },
         )
@@ -317,8 +374,8 @@ pub fn serve() {
                     ],
                     AuOperator::Tell,
                     Some(json),
-                    sys_shared5p.lock().unwrap(),
-                    roots_shared5p.lock().unwrap(),
+                    sys_shared10p.lock().unwrap(),
+                    roots_shared10p.lock().unwrap(),
                 )
             },
         )
@@ -335,8 +392,8 @@ pub fn serve() {
                     vec![id],
                     Ask,
                     None,
-                    sys_shared1.lock().unwrap(),
-                    roots_shared1.lock().unwrap(),
+                    sys_shared2.lock().unwrap(),
+                    roots_shared2.lock().unwrap(),
                 )
             },
         )
@@ -359,8 +416,8 @@ pub fn serve() {
                     vec![root_id.clone(), child_typ.clone(), id.clone()],
                     Ask,
                     None,
-                    sys_shared2.lock().unwrap(),
-                    roots_shared2.lock().unwrap(),
+                    sys_shared4.lock().unwrap(),
+                    roots_shared4.lock().unwrap(),
                 )
             },
         )
@@ -393,8 +450,8 @@ pub fn serve() {
                     ],
                     Ask,
                     None,
-                    sys_shared3.lock().unwrap(),
-                    roots_shared3.lock().unwrap(),
+                    sys_shared6.lock().unwrap(),
+                    roots_shared6.lock().unwrap(),
                 )
             },
         )
@@ -439,8 +496,8 @@ pub fn serve() {
                     ],
                     Ask,
                     None,
-                    sys_shared4.lock().unwrap(),
-                    roots_shared4.lock().unwrap(),
+                    sys_shared8.lock().unwrap(),
+                    roots_shared8.lock().unwrap(),
                 )
             },
         )
@@ -491,15 +548,340 @@ pub fn serve() {
                     ],
                     Ask,
                     None,
-                    sys_shared5.lock().unwrap(),
-                    roots_shared5.lock().unwrap(),
+                    sys_shared10.lock().unwrap(),
+                    roots_shared10.lock().unwrap(),
                 )
             },
         )
         .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| warp::reply::json(&reply));
 
+    let child_route_0 = warp::path("actor")
+        .and(warp::get2())
+        .and(warp::path("children"))
+        .map(move || -> Vec<String> {
+            let mut child_names: Vec<String> = Vec::new();
+            for x in roots_shared0c.lock().unwrap().keys() {
+                //child_names.push(x.name().to_string());
+                child_names.push(x.clone().to_string())
+            }
+            child_names
+        })
+        .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
+
+    let child_route_1 = warp::path("actor")
+        .and(warp::get2())
+        .and(warp::path::param::<String>())
+        .and(warp::path("children"))
+        .map(move |root_typ: String| -> Vec<String> {
+            ls_actor(
+                root_typ,
+                Vec::new(),
+                Ls,
+                None,
+                sys_shared1c.lock().unwrap(),
+                roots_shared1c.lock().unwrap(),
+            )
+        })
+        .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
+
+    let child_route_2 = warp::path("actor")
+        .and(warp::get2())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path("children"))
+        .map(move |root_typ: String, id: String| -> Vec<String> {
+            ls_actor(
+                root_typ,
+                vec![id],
+                Ls,
+                None,
+                sys_shared2c.lock().unwrap(),
+                roots_shared2c.lock().unwrap(),
+            )
+        })
+        .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
+
+    let child_route_3 = warp::path("actor")
+        .and(warp::get2())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path("children"))
+        .map(
+            move |root_typ: String, root_id: String, id: String| -> Vec<String> {
+                ls_actor(
+                    root_typ,
+                    vec![root_id, id],
+                    Ls,
+                    None,
+                    sys_shared3c.lock().unwrap(),
+                    roots_shared3c.lock().unwrap(),
+                )
+            },
+        )
+        .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
+
+    let child_route_4 = warp::path("actor")
+        .and(warp::get2())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path("children"))
+        .map(
+            move |root_typ: String,
+                  root_id: String,
+                  child_typ: String,
+                  id: String|
+                  -> Vec<String> {
+                ls_actor(
+                    root_typ,
+                    vec![root_id.clone(), child_typ.clone(), id.clone()],
+                    Ls,
+                    None,
+                    sys_shared4c.lock().unwrap(),
+                    roots_shared4c.lock().unwrap(),
+                )
+            },
+        )
+        .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
+
+    let child_route_5 = warp::path("actor")
+        .and(warp::get2())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path("children"))
+        .map(
+            move |root_typ: String,
+                  root_id: String,
+                  child1_typ: String,
+                  child_typ: String,
+                  id: String|
+                  -> Vec<String> {
+                ls_actor(
+                    root_typ,
+                    vec![
+                        root_id.clone(),
+                        child1_typ.clone(),
+                        child_typ.clone(),
+                        id.clone(),
+                    ],
+                    Ls,
+                    None,
+                    sys_shared5c.lock().unwrap(),
+                    roots_shared5c.lock().unwrap(),
+                )
+            },
+        )
+        .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
+
+    let child_route_6 = warp::path("actor")
+        .and(warp::get2())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path("children"))
+        .map(
+            move |root_typ: String,
+                  root_id: String,
+                  child1_typ: String,
+                  child1_id: String,
+                  child_typ: String,
+                  id: String|
+                  -> Vec<String> {
+                ls_actor(
+                    root_typ,
+                    vec![
+                        root_id.clone(),
+                        child1_typ.clone(),
+                        child1_id.clone(),
+                        child_typ.clone(),
+                        id.clone(),
+                    ],
+                    Ls,
+                    None,
+                    sys_shared6c.lock().unwrap(),
+                    roots_shared6c.lock().unwrap(),
+                )
+            },
+        )
+        .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
+
+    let child_route_7 = warp::path("actor")
+        .and(warp::get2())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path("children"))
+        .map(
+            move |root_typ: String,
+                  root_id: String,
+                  child1_typ: String,
+                  child1_id: String,
+                  child_typ: String,
+                  id: String|
+                  -> Vec<String> {
+                ls_actor(
+                    root_typ,
+                    vec![
+                        root_id.clone(),
+                        child1_typ.clone(),
+                        child1_id.clone(),
+                        child_typ.clone(),
+                        id.clone(),
+                    ],
+                    Ls,
+                    None,
+                    sys_shared7c.lock().unwrap(),
+                    roots_shared7c.lock().unwrap(),
+                )
+            },
+        )
+        .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
+
+    let child_route_8 = warp::path("actor")
+        .and(warp::get2())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path("children"))
+        .map(
+            move |root_typ: String,
+                  root_id: String,
+                  child1_typ: String,
+                  child1_id: String,
+                  child2_typ: String,
+                  child2_id: String,
+                  child_typ: String,
+                  id: String|
+                  -> Vec<String> {
+                ls_actor(
+                    root_typ,
+                    vec![
+                        root_id.clone(),
+                        child1_typ.clone(),
+                        child1_id.clone(),
+                        child2_typ.clone(),
+                        child2_id.clone(),
+                        child_typ.clone(),
+                        id.clone(),
+                    ],
+                    Ls,
+                    None,
+                    sys_shared8c.lock().unwrap(),
+                    roots_shared8c.lock().unwrap(),
+                )
+            },
+        )
+        .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
+
+    let child_route_9 = warp::path("actor")
+        .and(warp::get2())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path("children"))
+        .map(
+            move |root_typ: String,
+                  root_id: String,
+                  child1_typ: String,
+                  child1_id: String,
+                  child2_typ: String,
+                  child_typ: String,
+                  id: String|
+                  -> Vec<String> {
+                ls_actor(
+                    root_typ,
+                    vec![
+                        root_id.clone(),
+                        child1_typ.clone(),
+                        child1_id.clone(),
+                        child2_typ.clone(),
+                        child_typ.clone(),
+                        id.clone(),
+                    ],
+                    Ls,
+                    None,
+                    sys_shared9c.lock().unwrap(),
+                    roots_shared9c.lock().unwrap(),
+                )
+            },
+        )
+        .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
+
+    let child_route_10 = warp::path("actor")
+        .and(warp::get2())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path::param::<String>())
+        .and(warp::path("children"))
+        .map(
+            move |root_typ: String,
+                  root_id: String,
+                  child1_typ: String,
+                  child1_id: String,
+                  child2_typ: String,
+                  child2_id: String,
+                  child3_typ: String,
+                  child3_id: String,
+                  child_typ: String,
+                  id: String|
+                  -> Vec<String> {
+                ls_actor(
+                    root_typ,
+                    vec![
+                        root_id.clone(),
+                        child1_typ.clone(),
+                        child1_id.clone(),
+                        child2_typ.clone(),
+                        child2_id.clone(),
+                        child3_typ.clone(),
+                        child3_id.clone(),
+                        child_typ.clone(),
+                        id.clone(),
+                    ],
+                    Ls,
+                    None,
+                    sys_shared10c.lock().unwrap(),
+                    roots_shared10c.lock().unwrap(),
+                )
+            },
+        )
+        .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
+
     let post_routes =
         post_route_10.or(post_route_8.or(post_route_6.or(post_route_4.or(post_route_2))));
     let get_routes = get_route_10.or(get_route_8.or(get_route_6.or(get_route_4.or(get_route_2))));
-    warp::serve(get_routes.or(post_routes)).run(([127, 0, 0, 1], 3030));
+    let child_routes = child_route_10.or(child_route_9.or(child_route_8.or(child_route_7.or(
+        child_route_6.or(child_route_5.or(child_route_4.or(child_route_3
+            .or(child_route_2)
+            .or(child_route_1)
+            .or(child_route_0)))),
+    ))));
+    warp::serve(child_routes.or(get_routes.or(post_routes))).run(([127, 0, 0, 1], 3030));
 }

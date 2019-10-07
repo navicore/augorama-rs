@@ -13,6 +13,7 @@ use std::collections::HashMap;
 pub enum AuOperator {
     Ask,
     Tell,
+    Ls,
 }
 
 /// The single data structure representing the source of all actor state.
@@ -59,8 +60,9 @@ pub struct AuMsg<T> {
 impl std::fmt::Display for AuOperator {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            AuOperator::Ask => write!(f, "Get"),
-            AuOperator::Tell => write!(f, "Set"),
+            AuOperator::Ask => write!(f, "Ask"),
+            AuOperator::Tell => write!(f, "Tell"),
+            AuOperator::Ls => write!(f, "Ls"),
             //AugieCmd::Ls => write!(f, "Set"),
         }
     }

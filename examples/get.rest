@@ -11,7 +11,16 @@ POST /actor/person/Mary
 GET /actor/person/Mary
 
 --
-GET /actor/person/Erdal
+GET /actor/person/Erdal/children
+
+--
+GET /actor/children
+--
+GET /actor/person/children
+--
+GET /actor/person/Erdal/children
+--
+GET /actor/person/Erdal/pet/children
 
 --
 POST /actor/person/Erdal/pet/Sammy

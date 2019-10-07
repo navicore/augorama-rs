@@ -46,19 +46,28 @@ pub mod au;
 
 type AuActorRef = ActorRef<AuMsg<Vec<AuTelemetry>>>;
 
+fn safe_path(path: Vec<String>) -> Vec<String> {
+    let mut p: Vec<String> = Vec::new();
+    for x in path.iter() {
+        p.push(x.clone().to_lowercase().to_string())
+    }
+    p
+}
+
 fn tell_actor(
     root: String,
     path: Vec<String>,
-    cmd: AuOperator,
-    msg: Option<Vec<AuTelemetry>>,
+    op: AuOperator,
+    data: Option<Vec<AuTelemetry>>,
     sys_shared: MutexGuard<ActorSystem>,
     mut roots_shared: MutexGuard<HashMap<String, AuActorRef, RandomState>>,
 ) -> String {
-    debug!("handling {} {} {:?}", cmd, root, path);
+    debug!("handling {} {} {:?}", op, root, path);
+
     let aumsg: AuMsg<Vec<AuTelemetry>> = AuMsg {
-        data: msg,
-        op: cmd,
-        path,
+        data,
+        op,
+        path: safe_path(path),
     };
 
     let actor = match roots_shared.get(&root) {
@@ -92,7 +101,7 @@ fn ls_actor(
     let aumsg: AuMsg<Vec<AuTelemetry>> = AuMsg {
         data: msg,
         op: cmd,
-        path,
+        path: safe_path(path),
     };
 
     let actor = match roots_shared.get(&root) {
@@ -128,7 +137,7 @@ fn ask_actor(
     let aumsg: AuMsg<Vec<AuTelemetry>> = AuMsg {
         data: msg,
         op: cmd,
-        path,
+        path: safe_path(path),
     };
 
     let actor = match roots_shared.get(&root) {
@@ -874,14 +883,30 @@ pub fn serve() {
         )
         .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
 
-    let post_routes =
-        post_route_10.or(post_route_8.or(post_route_6.or(post_route_4.or(post_route_2))));
-    let get_routes = get_route_10.or(get_route_8.or(get_route_6.or(get_route_4.or(get_route_2))));
-    let child_routes = child_route_10.or(child_route_9.or(child_route_8.or(child_route_7.or(
-        child_route_6.or(child_route_5.or(child_route_4.or(child_route_3
-            .or(child_route_2)
-            .or(child_route_1)
-            .or(child_route_0)))),
-    ))));
-    warp::serve(child_routes.or(get_routes.or(post_routes))).run(([127, 0, 0, 1], 3030));
+    // ejs todo: create macros to tersely manage arbitrarily long paths - manage all routes with DRY
+    // ejs todo: create macros to tersely manage arbitrarily long paths - manage all routes with DRY
+    // ejs todo: create macros to tersely manage arbitrarily long paths - manage all routes with DRY
+    let routes = child_route_10
+        .or(child_route_9)
+        .or(child_route_8)
+        .or(child_route_7)
+        .or(child_route_6)
+        .or(child_route_5)
+        .or(child_route_4)
+        .or(child_route_3)
+        .or(child_route_2)
+        .or(child_route_1)
+        .or(child_route_0)
+        .or(post_route_10)
+        .or(post_route_8)
+        .or(post_route_6)
+        .or(post_route_4)
+        .or(post_route_2)
+        .or(get_route_10)
+        .or(get_route_8)
+        .or(get_route_6)
+        .or(get_route_4)
+        .or(get_route_2);
+
+    warp::serve(routes).run(([127, 0, 0, 1], 3030));
 }

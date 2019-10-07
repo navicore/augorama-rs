@@ -24,7 +24,7 @@ GET /actor/person/Erdal/pet/children
 
 --
 POST /actor/person/Erdal/pet/Sammy
-[{"name": "tag2.name", "value": 9.3, "datetime": "2019-10-06T13:20:16Z"}]
+[{"name": "tag1.name", "value": 9.3, "datetime": "2019-10-06T13:20:16Z"}]
 
 --
 GET /actor/person/Erdal/pet/Sammy

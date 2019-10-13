@@ -169,50 +169,30 @@ pub fn serve() {
     info!("starting actor space");
 
     let sys = Arc::new(Mutex::new(ActorSystem::new().unwrap()));
-    let sys_shared1c = sys.clone();
+    let roots: ActorRoots = Arc::new(Mutex::new(HashMap::new()));
+
+    //let sys_shared0 = sys.clone();
+    //let sys_shared0p = sys.clone();
+    //let sys_shared0c = sys.clone();
+    //let roots_shared0 = roots.clone();
+    //let roots_shared0p = roots.clone();
+    let roots_shared0c = roots.clone();
+    // todo: route 0
+
+    //let sys_shared1 = sys.clone();
+    //let sys_shared1p = sys.clone();
+    //let sys_shared1c = sys.clone();
+    //let roots_shared1 = roots.clone();
+    //let roots_shared1p = roots.clone();
+    //let roots_shared1c = roots.clone();
+    // todo: route 1
+
     let sys_shared2 = sys.clone();
     let sys_shared2p = sys.clone();
     let sys_shared2c = sys.clone();
-    let sys_shared3c = sys.clone();
-    let sys_shared4 = sys.clone();
-    let sys_shared4p = sys.clone();
-    let sys_shared4c = sys.clone();
-    let sys_shared5c = sys.clone();
-    let sys_shared6 = sys.clone();
-    let sys_shared6p = sys.clone();
-    let sys_shared6c = sys.clone();
-    let sys_shared7c = sys.clone();
-    let sys_shared8 = sys.clone();
-    let sys_shared8p = sys.clone();
-    let sys_shared8c = sys.clone();
-    let sys_shared9c = sys.clone();
-    let sys_shared10 = sys.clone();
-    let sys_shared10p = sys.clone();
-    let sys_shared10c = sys.clone();
-
-    let roots: ActorRoots = Arc::new(Mutex::new(HashMap::new()));
-    let roots_shared0c = roots.clone();
-    let roots_shared1c = roots.clone();
     let roots_shared2 = roots.clone();
     let roots_shared2p = roots.clone();
     let roots_shared2c = roots.clone();
-    let roots_shared3c = roots.clone();
-    let roots_shared4 = roots.clone();
-    let roots_shared4p = roots.clone();
-    let roots_shared4c = roots.clone();
-    let roots_shared5c = roots.clone();
-    let roots_shared6 = roots.clone();
-    let roots_shared6p = roots.clone();
-    let roots_shared6c = roots.clone();
-    let roots_shared7c = roots.clone();
-    let roots_shared8 = roots.clone();
-    let roots_shared8p = roots.clone();
-    let roots_shared8c = roots.clone();
-    let roots_shared9c = roots.clone();
-    let roots_shared10 = roots.clone();
-    let roots_shared10p = roots.clone();
-    let roots_shared10c = roots.clone();
-
     let post_route_2 = warp::path("actor")
         .and(warp::post2())
         .and(warp::path::param::<String>())
@@ -232,6 +212,20 @@ pub fn serve() {
         )
         .map(|reply| warp::reply::with_status(reply, warp::http::StatusCode::ACCEPTED));
 
+    //let sys_shared3 = sys.clone();
+    //let sys_shared3p = sys.clone();
+    let sys_shared3c = sys.clone();
+    //let roots_shared3 = roots.clone();
+    //let roots_shared3p = roots.clone();
+    let roots_shared3c = roots.clone();
+    // todo: route 3
+
+    let sys_shared4 = sys.clone();
+    let sys_shared4p = sys.clone();
+    let sys_shared4c = sys.clone();
+    let roots_shared4 = roots.clone();
+    let roots_shared4p = roots.clone();
+    let roots_shared4c = roots.clone();
     let post_route_4 = warp::path("actor")
         .and(warp::post2())
         .and(warp::path::param::<String>())
@@ -258,6 +252,20 @@ pub fn serve() {
         )
         .map(|reply| warp::reply::with_status(reply, warp::http::StatusCode::ACCEPTED));
 
+    //let sys_shared5 = sys.clone();
+    //let sys_shared5p = sys.clone();
+    let sys_shared5c = sys.clone();
+    //let roots_shared5 = roots.clone();
+    //let roots_shared5p = roots.clone();
+    let roots_shared5c = roots.clone();
+    // todo: route 5
+
+    let sys_shared6 = sys.clone();
+    let sys_shared6p = sys.clone();
+    let sys_shared6c = sys.clone();
+    let roots_shared6 = roots.clone();
+    let roots_shared6p = roots.clone();
+    let roots_shared6c = roots.clone();
     let post_route_6 = warp::path("actor")
         .and(warp::post2())
         .and(warp::path::param::<String>())
@@ -300,6 +308,20 @@ pub fn serve() {
         )
         .map(|reply| warp::reply::with_status(reply, warp::http::StatusCode::ACCEPTED));
 
+    //let sys_shared7 = sys.clone();
+    //let sys_shared7p = sys.clone();
+    let sys_shared7c = sys.clone();
+    //let roots_shared7 = roots.clone();
+    //let roots_shared7p = roots.clone();
+    let roots_shared7c = roots.clone();
+    // todo: route 7
+
+    let sys_shared8 = sys.clone();
+    let sys_shared8p = sys.clone();
+    let sys_shared8c = sys.clone();
+    let roots_shared8 = roots.clone();
+    let roots_shared8p = roots.clone();
+    let roots_shared8c = roots.clone();
     let post_route_8 = warp::path("actor")
         .and(warp::post2())
         .and(warp::path::param::<String>())
@@ -342,6 +364,20 @@ pub fn serve() {
         )
         .map(|reply| warp::reply::with_status(reply, warp::http::StatusCode::ACCEPTED));
 
+    //let sys_shared9 = sys.clone();
+    //let sys_shared9p = sys.clone();
+    let sys_shared9c = sys.clone();
+    //let roots_shared9 = roots.clone();
+    //let roots_shared9p = roots.clone();
+    let roots_shared9c = roots.clone();
+    // todo: route 9
+
+    let sys_shared10 = sys.clone();
+    let sys_shared10p = sys.clone();
+    let sys_shared10c = sys.clone();
+    let roots_shared10 = roots.clone();
+    let roots_shared10p = roots.clone();
+    let roots_shared10c = roots.clone();
     let post_route_10 = warp::path("actor")
         .and(warp::post2())
         .and(warp::path::param::<String>())
@@ -577,6 +613,8 @@ pub fn serve() {
         })
         .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
 
+    let sys_shared1c = sys.clone();
+    let roots_shared1c = roots.clone();
     let child_route_1 = warp::path("actor")
         .and(warp::get2())
         .and(warp::path::param::<String>())

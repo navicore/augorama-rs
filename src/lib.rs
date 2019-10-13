@@ -242,7 +242,7 @@ pub fn serve() {
                   -> String {
                 tell_actor(
                     root_typ,
-                    vec![root_id.clone(), child_typ.clone(), id.clone()],
+                    vec![root_id, child_typ, id],
                     AuOperator::Tell,
                     Some(json),
                     sys_shared4p.lock().unwrap(),
@@ -291,13 +291,7 @@ pub fn serve() {
                 tell_actor(
                     root_typ,
                     vec![
-                        root_id.clone(),
-                        child1_typ.clone(),
-                        child1_id.clone(),
-                        child2_typ.clone(),
-                        child2_id.clone(),
-                        child_typ.clone(),
-                        id.clone(),
+                        root_id, child1_typ, child1_id, child2_typ, child2_id, child_typ, id,
                     ],
                     AuOperator::Tell,
                     Some(json),
@@ -347,13 +341,7 @@ pub fn serve() {
                 tell_actor(
                     root_typ,
                     vec![
-                        root_id.clone(),
-                        child1_typ.clone(),
-                        child1_id.clone(),
-                        child2_typ.clone(),
-                        child2_id.clone(),
-                        child_typ.clone(),
-                        id.clone(),
+                        root_id, child1_typ, child1_id, child2_typ, child2_id, child_typ, id,
                     ],
                     AuOperator::Tell,
                     Some(json),
@@ -407,15 +395,8 @@ pub fn serve() {
                 tell_actor(
                     root_typ,
                     vec![
-                        root_id.clone(),
-                        child1_typ.clone(),
-                        child1_id.clone(),
-                        child2_typ.clone(),
-                        child2_id.clone(),
-                        child3_typ.clone(),
-                        child3_id.clone(),
-                        child_typ.clone(),
-                        id.clone(),
+                        root_id, child1_typ, child1_id, child2_typ, child2_id, child3_typ,
+                        child3_id, child_typ, id,
                     ],
                     AuOperator::Tell,
                     Some(json),
@@ -458,7 +439,7 @@ pub fn serve() {
                   -> Option<Vec<AuTelemetry>> {
                 ask_actor(
                     root_typ,
-                    vec![root_id.clone(), child_typ.clone(), id.clone()],
+                    vec![root_id, child_typ, id],
                     Ask,
                     None,
                     sys_shared4.lock().unwrap(),
@@ -486,13 +467,7 @@ pub fn serve() {
                   -> Option<Vec<AuTelemetry>> {
                 ask_actor(
                     root_typ,
-                    vec![
-                        root_id.clone(),
-                        child1_typ.clone(),
-                        child1_id.clone(),
-                        child_typ.clone(),
-                        id.clone(),
-                    ],
+                    vec![root_id, child1_typ, child1_id, child_typ, id],
                     Ask,
                     None,
                     sys_shared6.lock().unwrap(),
@@ -529,15 +504,8 @@ pub fn serve() {
                 ask_actor(
                     root_typ,
                     vec![
-                        root_id.clone(),
-                        child1_typ.clone(),
-                        child1_id.clone(),
-                        child2_typ.clone(),
-                        child2_id.clone(),
-                        child3_typ.clone(),
-                        child3_id.clone(),
-                        child_typ.clone(),
-                        id.clone(),
+                        root_id, child1_typ, child1_id, child2_typ, child2_id, child3_typ,
+                        child3_id, child_typ, id,
                     ],
                     Ask,
                     None,
@@ -579,17 +547,8 @@ pub fn serve() {
                 ask_actor(
                     root_typ,
                     vec![
-                        root_id.clone(),
-                        child1_typ.clone(),
-                        child1_id.clone(),
-                        child2_typ.clone(),
-                        child2_id.clone(),
-                        child3_typ.clone(),
-                        child3_id.clone(),
-                        child4_typ.clone(),
-                        child4_id.clone(),
-                        child_typ.clone(),
-                        id.clone(),
+                        root_id, child1_typ, child1_id, child2_typ, child2_id, child3_typ,
+                        child3_id, child4_typ, child4_id, child_typ, id,
                     ],
                     Ask,
                     None,
@@ -613,8 +572,6 @@ pub fn serve() {
         })
         .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
 
-    let sys_shared1c = sys.clone();
-    let roots_shared1c = roots.clone();
     let child_route_1 = warp::path("actor")
         .and(warp::get2())
         .and(warp::path::param::<String>())
@@ -625,8 +582,8 @@ pub fn serve() {
                 Vec::new(),
                 Ls,
                 None,
-                sys_shared1c.lock().unwrap(),
-                roots_shared1c.lock().unwrap(),
+                sys.lock().unwrap(),
+                roots.lock().unwrap(),
             )
         })
         .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
@@ -683,7 +640,7 @@ pub fn serve() {
                   -> Vec<String> {
                 ls_actor(
                     root_typ,
-                    vec![root_id.clone(), child_typ.clone(), id.clone()],
+                    vec![root_id, child_typ, id],
                     Ls,
                     None,
                     sys_shared4c.lock().unwrap(),
@@ -710,12 +667,7 @@ pub fn serve() {
                   -> Vec<String> {
                 ls_actor(
                     root_typ,
-                    vec![
-                        root_id.clone(),
-                        child1_typ.clone(),
-                        child_typ.clone(),
-                        id.clone(),
-                    ],
+                    vec![root_id, child1_typ, child_typ, id],
                     Ls,
                     None,
                     sys_shared5c.lock().unwrap(),
@@ -744,13 +696,7 @@ pub fn serve() {
                   -> Vec<String> {
                 ls_actor(
                     root_typ,
-                    vec![
-                        root_id.clone(),
-                        child1_typ.clone(),
-                        child1_id.clone(),
-                        child_typ.clone(),
-                        id.clone(),
-                    ],
+                    vec![root_id, child1_typ, child1_id, child_typ, id],
                     Ls,
                     None,
                     sys_shared6c.lock().unwrap(),
@@ -779,13 +725,7 @@ pub fn serve() {
                   -> Vec<String> {
                 ls_actor(
                     root_typ,
-                    vec![
-                        root_id.clone(),
-                        child1_typ.clone(),
-                        child1_id.clone(),
-                        child_typ.clone(),
-                        id.clone(),
-                    ],
+                    vec![root_id, child1_typ, child1_id, child_typ, id],
                     Ls,
                     None,
                     sys_shared7c.lock().unwrap(),
@@ -819,13 +759,7 @@ pub fn serve() {
                 ls_actor(
                     root_typ,
                     vec![
-                        root_id.clone(),
-                        child1_typ.clone(),
-                        child1_id.clone(),
-                        child2_typ.clone(),
-                        child2_id.clone(),
-                        child_typ.clone(),
-                        id.clone(),
+                        root_id, child1_typ, child1_id, child2_typ, child2_id, child_typ, id,
                     ],
                     Ls,
                     None,
@@ -857,14 +791,7 @@ pub fn serve() {
                   -> Vec<String> {
                 ls_actor(
                     root_typ,
-                    vec![
-                        root_id.clone(),
-                        child1_typ.clone(),
-                        child1_id.clone(),
-                        child2_typ.clone(),
-                        child_typ.clone(),
-                        id.clone(),
-                    ],
+                    vec![root_id, child1_typ, child1_id, child2_typ, child_typ, id],
                     Ls,
                     None,
                     sys_shared9c.lock().unwrap(),
@@ -902,15 +829,8 @@ pub fn serve() {
                 ls_actor(
                     root_typ,
                     vec![
-                        root_id.clone(),
-                        child1_typ.clone(),
-                        child1_id.clone(),
-                        child2_typ.clone(),
-                        child2_id.clone(),
-                        child3_typ.clone(),
-                        child3_id.clone(),
-                        child_typ.clone(),
-                        id.clone(),
+                        root_id, child1_typ, child1_id, child2_typ, child2_id, child3_typ,
+                        child3_id, child_typ, id,
                     ],
                     Ls,
                     None,

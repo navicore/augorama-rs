@@ -1,6 +1,8 @@
 Augorama (for rust)
 ==========
 
+See https://github.com/navicore/augorama for information about the Augorama concepts and scope.
+
 # UNDER CONSTRUCTION
 
 # UNDER CONSTRUCTION

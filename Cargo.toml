@@ -1,22 +1,23 @@
 [package]
 name = "augorama"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Ed Sweeney <ed@onextent.com>"]
-edition = "2018"
+edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
 log = "0.4.8"
 env_logger = "0.7.0"
-warp = "0.1.20"
+warp = "0.3.2"
+tokio = { version = "1", features = ["full"] }
 riker = "0.3.2"
 riker-patterns = "0.3.2"
 either = "1.5.3"
 chrono = { version = "0.4.9", features = ["serde"] }
 futures-preview = "0.3.0-alpha.19"
-serde = "1.0.101"
+serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.41"
-augorama_derive = {git = "https://github.com/navicore/augorama_derive-rs", rev = "HEAD"}
+augorama_derive = {git = "https://github.com/navicore/augorama_derive-rs", tag = "v0.2.0"}
 
 [dev-dependencies]
 reqwest = "0.9.22"

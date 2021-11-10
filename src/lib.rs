@@ -162,7 +162,8 @@ fn ask_actor(
 }
 
 /// blocking call to run server.  server will open a port and expect http requests.
-pub fn serve() {
+#[tokio::main]
+pub async fn serve() {
     type ActorRoots = Arc<Mutex<HashMap<String, ActorRef<AuMsg<Vec<AuTelemetry>>>>>>;
 
     env_logger::init();
@@ -194,7 +195,7 @@ pub fn serve() {
     let roots_shared2p = roots.clone();
     let roots_shared2c = roots.clone();
     let post_route_2 = warp::path("actor")
-        .and(warp::post2())
+        .and(warp::post())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::body::json())
@@ -227,7 +228,7 @@ pub fn serve() {
     let roots_shared4p = roots.clone();
     let roots_shared4c = roots.clone();
     let post_route_4 = warp::path("actor")
-        .and(warp::post2())
+        .and(warp::post())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
@@ -267,7 +268,7 @@ pub fn serve() {
     let roots_shared6p = roots.clone();
     let roots_shared6c = roots.clone();
     let post_route_6 = warp::path("actor")
-        .and(warp::post2())
+        .and(warp::post())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
@@ -317,7 +318,7 @@ pub fn serve() {
     let roots_shared8p = roots.clone();
     let roots_shared8c = roots.clone();
     let post_route_8 = warp::path("actor")
-        .and(warp::post2())
+        .and(warp::post())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
@@ -367,7 +368,7 @@ pub fn serve() {
     let roots_shared10p = roots.clone();
     let roots_shared10c = roots.clone();
     let post_route_10 = warp::path("actor")
-        .and(warp::post2())
+        .and(warp::post())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
@@ -408,7 +409,7 @@ pub fn serve() {
         .map(|reply| warp::reply::with_status(reply, warp::http::StatusCode::ACCEPTED));
 
     let get_route_2 = warp::path("actor")
-        .and(warp::get2())
+        .and(warp::get())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .map(
@@ -426,7 +427,7 @@ pub fn serve() {
         .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| warp::reply::json(&reply));
 
     let get_route_4 = warp::path("actor")
-        .and(warp::get2())
+        .and(warp::get())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
@@ -450,7 +451,7 @@ pub fn serve() {
         .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| warp::reply::json(&reply));
 
     let get_route_6 = warp::path("actor")
-        .and(warp::get2())
+        .and(warp::get())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
@@ -478,7 +479,7 @@ pub fn serve() {
         .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| warp::reply::json(&reply));
 
     let get_route_8 = warp::path("actor")
-        .and(warp::get2())
+        .and(warp::get())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
@@ -517,7 +518,7 @@ pub fn serve() {
         .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| warp::reply::json(&reply));
 
     let get_route_10 = warp::path("actor")
-        .and(warp::get2())
+        .and(warp::get())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
@@ -560,7 +561,7 @@ pub fn serve() {
         .map(|reply: Option<std::vec::Vec<au::model::AuTelemetry>>| warp::reply::json(&reply));
 
     let child_route_0 = warp::path("actor")
-        .and(warp::get2())
+        .and(warp::get())
         .and(warp::path("children"))
         .map(move || -> Vec<String> {
             let mut child_names: Vec<String> = Vec::new();
@@ -573,7 +574,7 @@ pub fn serve() {
         .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
 
     let child_route_1 = warp::path("actor")
-        .and(warp::get2())
+        .and(warp::get())
         .and(warp::path::param::<String>())
         .and(warp::path("children"))
         .map(move |root_typ: String| -> Vec<String> {
@@ -589,7 +590,7 @@ pub fn serve() {
         .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
 
     let child_route_2 = warp::path("actor")
-        .and(warp::get2())
+        .and(warp::get())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path("children"))
@@ -606,7 +607,7 @@ pub fn serve() {
         .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
 
     let child_route_3 = warp::path("actor")
-        .and(warp::get2())
+        .and(warp::get())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
@@ -626,7 +627,7 @@ pub fn serve() {
         .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
 
     let child_route_4 = warp::path("actor")
-        .and(warp::get2())
+        .and(warp::get())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
@@ -651,7 +652,7 @@ pub fn serve() {
         .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
 
     let child_route_5 = warp::path("actor")
-        .and(warp::get2())
+        .and(warp::get())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
@@ -678,7 +679,7 @@ pub fn serve() {
         .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
 
     let child_route_6 = warp::path("actor")
-        .and(warp::get2())
+        .and(warp::get())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
@@ -707,7 +708,7 @@ pub fn serve() {
         .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
 
     let child_route_7 = warp::path("actor")
-        .and(warp::get2())
+        .and(warp::get())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
@@ -736,7 +737,7 @@ pub fn serve() {
         .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
 
     let child_route_8 = warp::path("actor")
-        .and(warp::get2())
+        .and(warp::get())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
@@ -771,7 +772,7 @@ pub fn serve() {
         .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
 
     let child_route_9 = warp::path("actor")
-        .and(warp::get2())
+        .and(warp::get())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
@@ -802,7 +803,7 @@ pub fn serve() {
         .map(|reply: std::vec::Vec<String>| warp::reply::json(&reply));
 
     let child_route_10 = warp::path("actor")
-        .and(warp::get2())
+        .and(warp::get())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
         .and(warp::path::param::<String>())
@@ -866,5 +867,5 @@ pub fn serve() {
         .or(get_route_4)
         .or(get_route_2);
 
-    warp::serve(routes).run(([127, 0, 0, 1], 3030));
+    warp::serve(routes).run(([127, 0, 0, 1], 3030)).await;
 }

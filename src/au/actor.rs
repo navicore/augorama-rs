@@ -62,7 +62,7 @@ impl AugieActor {
                             next_id
                         );
                         let props = AugieActor::props();
-                        let new_actor = ctx.actor_of(props, &next_id).unwrap();
+                        let new_actor = ctx.actor_of(props, next_id).unwrap();
                         new_actor.tell(fmsg, sender);
                     }
                 };

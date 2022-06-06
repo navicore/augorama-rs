@@ -61,7 +61,7 @@ dependencies = [
  "riker-patterns",
  "serde 1.0.130",
  "serde_json",
- "tokio 1.13.0",
+ "tokio 1.13.1",
  "warp",
 ]
 
@@ -81,7 +81,7 @@ dependencies = [
  "serde 1.0.130",
  "serde_json",
  "syn 0.14.9",
- "tokio 1.13.0",
+ "tokio 1.13.1",
  "warp",
 ]
 
@@ -658,7 +658,7 @@ dependencies = [
  "http 0.2.5",
  "indexmap",
  "slab",
- "tokio 1.13.0",
+ "tokio 1.13.1",
  "tokio-util",
  "tracing",
 ]
@@ -817,7 +817,7 @@ dependencies = [
  "itoa",
  "pin-project-lite",
  "socket2",
- "tokio 1.13.0",
+ "tokio 1.13.1",
  "tower-service",
  "tracing",
  "want 0.3.0",
@@ -2072,9 +2072,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.13.0"
+version = "1.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "588b2d10a336da58d877567cd8fb8a14b463e2104910f8132cd054b4b96e29ee"
+checksum = "52963f91310c08d91cb7bff5786dfc8b79642ab839e188187e92105dbfb9d2c8"
 dependencies = [
  "autocfg 1.0.1",
  "bytes 1.1.0",
@@ -2170,7 +2170,7 @@ checksum = "50145484efff8818b5ccd256697f36863f587da82cf8b409c53adf1e840798e3"
 dependencies = [
  "futures-core",
  "pin-project-lite",
- "tokio 1.13.0",
+ "tokio 1.13.1",
 ]
 
 [[package]]
@@ -2235,7 +2235,7 @@ dependencies = [
  "futures-util",
  "log",
  "pin-project",
- "tokio 1.13.0",
+ "tokio 1.13.1",
  "tungstenite",
 ]
 
@@ -2250,7 +2250,7 @@ dependencies = [
  "futures-sink",
  "log",
  "pin-project-lite",
- "tokio 1.13.0",
+ "tokio 1.13.1",
 ]
 
 [[package]]
@@ -2495,7 +2495,7 @@ dependencies = [
  "serde 1.0.130",
  "serde_json",
  "serde_urlencoded 0.7.0",
- "tokio 1.13.0",
+ "tokio 1.13.1",
  "tokio-stream",
  "tokio-tungstenite",
  "tokio-util",
